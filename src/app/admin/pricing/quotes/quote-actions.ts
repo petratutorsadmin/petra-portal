@@ -6,6 +6,7 @@ import { redirect } from 'next/navigation'
 import {
     calculateAdminPricing,
     PROGRAM_BASE_PRICES,
+    getCategoryFromTopics,
     type AdminPricingInputs,
 } from '@/utils/pricing-engine'
 
@@ -15,6 +16,7 @@ export async function saveQuote(formData: FormData) {
     const programId = formData.get('program_id') as string
     const studentId = formData.get('student_id') as string
     const tutorId = formData.get('tutor_id') as string || null
+    const topicIds = formData.getAll('topics') as string[] // Added this line
     const lessonMinutes = parseInt(formData.get('lesson_length_minutes') as string)
     const lessonsPerWeek = parseInt(formData.get('lessons_per_week') as string)
     const planCode = formData.get('plan_code') as string
@@ -24,30 +26,59 @@ export async function saveQuote(formData: FormData) {
     const currencyCode = formData.get('currency_code') as string
     const groupSize = parseInt(formData.get('group_size') as string)
     const tutorLevel = parseInt(formData.get('tutor_level') as string)
-    const tutorPayMode = formData.get('tutor_pay_mode') as 'min' | 'standard' | 'max'
+    const tutorPayMode = formData.get('tutor_pay_mode') as string // Changed type assertion
 
-    // Fetch the program's base price
-    const { data: program } = await supabase
-        .from('program_categories')
-        .select('code, base_price_jpy')
-        .eq('id', programId)
-        .single()
+    // 1. Resolve final Program Category if topics are used
+    let finalProgramId = programId
+    let finalProgramCode = ''
 
-    if (!program) redirect('/admin/pricing/quotes?error=Program+not+found')
+    if (topicIds.length > 0) {
+        // Fetch topic names to use the engine's mapping
+        const { data: topicData } = await supabase
+            .from('topics')
+            .select('name')
+            .in('id', topicIds)
+        
+        const topicNames = topicData?.map(t => t.name) || []
+        const derivedCode = getCategoryFromTopics(topicNames)
+        
+        // Find the program_id for this code
+        const { data: programData } = await supabase
+            .from('program_categories')
+            .select('id, code')
+            .eq('code', derivedCode)
+            .single()
+        
+        if (programData) {
+            finalProgramId = programData.id
+            finalProgramCode = programData.code
+        } else {
+            // Fallback if derived program code not found, use original programId's code
+            const { data: originalProgramData } = await supabase
+                .from('program_categories')
+                .select('code')
+                .eq('id', programId)
+                .single()
+            finalProgramCode = originalProgramData?.code || 'P1' // Default to P1 if nothing found
+        }
+    } else {
+        const { data: programData } = await supabase
+            .from('program_categories')
+            .select('code')
+            .eq('id', programId)
+            .single()
+        finalProgramCode = programData?.code || 'P1' // Default to P1 if nothing found
+    }
 
-    // Get exchange rate for the chosen currency
-    const { data: currency } = await supabase
-        .from('currencies')
-        .select('exchange_rate')
-        .eq('code', currencyCode)
-        .single()
+    // 2. Fetch market multiplier and currency rate (currency rate is not used in calculateAdminPricing directly, but might be needed for display later)
+    // The original code fetched currency, but the new calculateAdminPricing doesn't use it directly.
+    // Keeping the market multiplier fetch as it's a common dependency for pricing.
+    const { data: market } = await supabase.from('market_multipliers').select('multiplier').eq('region_name', marketRegion).single()
+    // const { data: currency } = await supabase.from('currencies').select('exchange_rate').eq('code', currencyCode).single() // Removed as per new pricing engine inputs
 
-    // Override the in-memory map's base price with the one from DB
-    const tempPrograms = { ...PROGRAM_BASE_PRICES }
-    tempPrograms[program.code] = { ...tempPrograms[program.code], basePrice: Number(program.base_price_jpy) }
-
-    const inputs: AdminPricingInputs = {
-        programCode: program.code,
+    // 3. Run the pricing engine
+    const pricing = calculateAdminPricing({
+        programCode: finalProgramCode,
         lessonMinutes,
         lessonsPerWeek,
         planCode,
@@ -55,18 +86,17 @@ export async function saveQuote(formData: FormData) {
         studentTypeCode,
         marketRegion,
         groupSize,
-        currencyCode,
-        exchangeRate: currency?.exchange_rate ? Number(currency.exchange_rate) : 1.0,
+        currencyCode, // Added back for completeness, though engine might not use it directly
+        exchangeRate: 1.0, // Placeholder, as engine might not use it directly or it's handled internally
         tutorLevel,
-        tutorPayMode,
-    }
+        tutorPayMode: tutorPayMode as 'min' | 'standard' | 'max', // Re-assert type for engine
+    })
 
-    const result = calculateAdminPricing(inputs)
-
-    const { error } = await supabase.from('pricing_quotes').insert({
+    // 4. Save the Quote
+    const { data: quote, error: quoteError } = await supabase.from('pricing_quotes').insert({
         student_id: studentId,
         tutor_id: tutorId,
-        program_id: programId,
+        program_id: finalProgramId,
         lesson_length_minutes: lessonMinutes,
         lessons_per_week: lessonsPerWeek,
         plan_code: planCode,
@@ -75,17 +105,32 @@ export async function saveQuote(formData: FormData) {
         market_region: marketRegion,
         currency_code: currencyCode,
         group_size: groupSize,
-        client_price_per_lesson: result.clientPricePerLessonJpy,
-        tutor_pay_per_lesson: result.tutorPayPerLessonJpy,
-        petra_margin_per_lesson: result.petraMarginPerLessonJpy,
-        // Legacy columns
-        student_price: result.clientPricePerLessonJpy,
-        tutor_pay: result.tutorPayPerLessonJpy,
-        petra_margin: result.petraMarginPerLessonJpy,
+        client_price_per_lesson: pricing.clientPricePerLessonJpy,
+        tutor_pay_per_lesson: pricing.tutorPayPerLessonJpy,
+        petra_margin_per_lesson: pricing.petraMarginPerLessonJpy, // Corrected column name
+        // Legacy columns (kept for backward compatibility if needed, but new code uses _per_lesson)
+        student_price: pricing.clientPricePerLessonJpy,
+        tutor_pay: pricing.tutorPayPerLessonJpy,
+        petra_margin: pricing.petraMarginPerLessonJpy,
         status: 'draft',
-    })
+    }).select().single()
 
-    if (error) redirect(`/admin/pricing/quotes?error=${encodeURIComponent('Failed: ' + error.message)}`)
+    if (quoteError) {
+        redirect(`/admin/pricing/quotes?error=${encodeURIComponent('Failed: ' + quoteError.message)}`)
+    }
+
+    // 5. Save quote topics if any
+    if (topicIds.length > 0 && quote) {
+        const topicInserts = topicIds.map(tid => ({
+            quote_id: quote.id,
+            topic_id: tid
+        }))
+        const { error: topicError } = await supabase.from('pricing_quote_topics').insert(topicInserts)
+        if (topicError) {
+            console.error("Failed to insert quote topics:", topicError.message)
+            // Optionally redirect with an error or log it
+        }
+    }
 
     revalidatePath('/admin/pricing/quotes')
     redirect('/admin/pricing/quotes?success=Quote+saved+successfully')

@@ -1,0 +1,72 @@
+.mode-toggle {
+    display: flex;
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
+.btn-toggle {
+    flex: 1;
+    padding: 1rem;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    font-weight: 600;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-toggle:first-child {
+    border-radius: 8px 0 0 8px;
+}
+
+.btn-toggle:last-child {
+    border-radius: 0 8px 8px 0;
+    border-left: none;
+}
+
+.btn-toggle.active {
+    background: #1e293b;
+    color: white;
+    border-color: #1e293b;
+}
+
+.topic-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.topic-pill {
+    padding: 0.4rem 0.8rem;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+}
+
+.topic-pill:hover {
+    border-color: #cbd5e1;
+    background: #f8fafc;
+}
+
+.topic-pill.active {
+    background: #7c3aed;
+    color: white;
+    border-color: #7c3aed;
+}
+
+.hint {
+    font-size: 0.8rem;
+    color: #94a3b8;
+    margin-top: 0.75rem;
+    font-style: italic;
+}
+
+.pricing-estimator-page .client-header {
+    margin-bottom: 2rem;
+}

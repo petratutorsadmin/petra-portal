@@ -19,6 +19,7 @@ export default async function AdminQuotesPage({
         { data: tutors },
         { data: markets },
         { data: currencies },
+        { data: topics },
         { data: quotes },
     ] = await Promise.all([
         supabase.from('program_categories').select('id, code, name, base_price_jpy').order('code'),
@@ -26,6 +27,7 @@ export default async function AdminQuotesPage({
         supabase.from('profiles').select('id, first_name, last_name, tutor_profiles(tutor_level, tutor_pay_mode)').eq('role', 'tutor').order('first_name'),
         supabase.from('market_multipliers').select('region_name, multiplier').order('region_name'),
         supabase.from('currencies').select('code, exchange_rate').order('code'),
+        supabase.from('topics').select('id, name, category_code').order('name'),
         supabase.from('pricing_quotes')
             .select('*, student:student_profiles(profiles(first_name, last_name)), program:program_categories(code, name)')
             .order('created_at', { ascending: false })
@@ -72,18 +74,34 @@ export default async function AdminQuotesPage({
                     </div>
 
                     {/* Row 2: Program + Lesson Length */}
+                    {/* Row 2: Program */}
                     <div className="form-row">
                         <div className="form-group flex-1">
-                            <label htmlFor="program_id">Program *</label>
+                            <label htmlFor="program_id">Base Program Category *</label>
                             <select id="program_id" name="program_id" required>
                                 <option value="">— Select Program —</option>
                                 {programs?.map(p => (
-                                    <option key={p.id} value={p.id} data-price={p.base_price_jpy} data-code={p.code}>
-                                        {p.code} — {p.name} (¥{Number(p.base_price_jpy).toLocaleString()})
-                                    </option>
+                                    <option key={p.id} value={p.id}>{p.code} — {p.name}</option>
                                 ))}
                             </select>
                         </div>
+                    </div>
+
+                    {/* New: Topic Selector */}
+                    <div className="form-group mt-2">
+                        <label>Flexible Tutoring Topics (Automatically sets Program Category)</label>
+                        <div className="topic-grid admin-topic-grid">
+                            {topics?.map(t => (
+                                <label key={t.id} className="admin-topic-pill">
+                                    <input type="checkbox" name="topics" value={t.id} />
+                                    {t.name}
+                                </label>
+                            ))}
+                        </div>
+                        <p className="hint">If topics are selected, the Program field above will be overridden by the highest category (P2-P4).</p>
+                    </div>
+
+                    <div className="form-row">
                         <div className="form-group" style={{ width: '160px' }}>
                             <label htmlFor="lesson_length_minutes">Lesson Length</label>
                             <select id="lesson_length_minutes" name="lesson_length_minutes">

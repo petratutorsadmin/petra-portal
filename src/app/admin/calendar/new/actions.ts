@@ -25,7 +25,19 @@ export async function createLesson(formData: FormData) {
         redirect('/admin/calendar/new?error=Match+not+found')
     }
 
-    // 2. Fetch the program to get the name/subject
+    // 2. Check for locked enrollment (payment check)
+    const { data: enrollment } = await supabase
+        .from('student_enrollments')
+        .select('id, locked')
+        .eq('student_id', match.student_id)
+        .eq('status', 'active')
+        .maybeSingle()
+
+    if (!enrollment || !enrollment.locked) {
+        redirect('/admin/calendar/new?error=Lessons+cannot+be+scheduled+until+payment+is received+and+plan+is+locked.')
+    }
+
+    // 3. Fetch the program to get the name/subject
     const { data: program } = await supabase
         .from('program_categories')
         .select('name, code')

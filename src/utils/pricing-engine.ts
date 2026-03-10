@@ -92,10 +92,34 @@ export const PROGRAM_BASE_PRICES: Record<string, { name: string; basePrice: numb
     P11: { name: 'Ultra Premium Consulting',          basePrice: 17500 },
 }
 
+// ─── Topics Mapping ───────────────────────────────────────────────────────
+
+export const TOPICS_MAPPING: Record<string, string> = {
+    'Homework Help': 'P2', 'Basic Grammar': 'P2', 'Reading Practice': 'P2', 'Vocabulary Building': 'P2', 'School English Support': 'P2',
+    'Conversation': 'P3', 'Pronunciation': 'P3', 'Listening Skills': 'P3', 'Travel English': 'P3', 'Cultural Discussion': 'P3', 'Fluency Practice': 'P3', 'Idioms & Expressions': 'P3',
+    'Essay Writing': 'P4', 'Academic Vocabulary': 'P4', 'Presentation Skills': 'P4', 'Research Skills': 'P4', 'Critical Reading': 'P4', 'Argument Writing': 'P4', 'Academic Grammar': 'P4', 'Summary Writing': 'P4',
+}
+
+/**
+ * Returns the highest program category code (P2 < P3 < P4) among a list of topic names.
+ */
+export function getCategoryFromTopics(topics: string[]): string {
+    if (topics.length === 0) return 'P1'
+    
+    const categories = topics.map(t => TOPICS_MAPPING[t] || 'P1')
+    
+    // Logic: P4 > P3 > P2 > P1
+    if (categories.includes('P4')) return 'P4'
+    if (categories.includes('P3')) return 'P3'
+    if (categories.includes('P2')) return 'P2'
+    return 'P1'
+}
+
 // ─── Types ───────────────────────────────────────────────────────────────────
 
 export interface PricingInputs {
-    programCode: string     // P1–P11
+    programCode?: string    // P1–P11 (optional if topics are provided)
+    topics?: string[]       // List of topic names
     lessonMinutes: number   // 45, 60, 90, 120
     lessonsPerWeek: number  // 1–4
     planCode: string        // PAYG, M1–M12
@@ -135,8 +159,17 @@ export interface AdminPricingResult extends PricingResult {
  * Never include tutor pay or margin in this function's return.
  */
 export function calculateClientPrice(inputs: PricingInputs): PricingResult {
-    const program = PROGRAM_BASE_PRICES[inputs.programCode]
-    if (!program) throw new Error(`Unknown program code: ${inputs.programCode}`)
+    let programCode = inputs.programCode
+    
+    // If topics are provided, they determine the program code
+    if (inputs.topics && inputs.topics.length > 0) {
+        programCode = getCategoryFromTopics(inputs.topics)
+    }
+
+    if (!programCode) throw new Error('Program code or topics must be provided')
+
+    const program = PROGRAM_BASE_PRICES[programCode]
+    if (!program) throw new Error(`Unknown program code: ${programCode}`)
 
     const lenMult   = LESSON_LENGTH_MULTIPLIERS[inputs.lessonMinutes] ?? 1.0
     const stMult    = STUDENT_TYPE_MULTIPLIERS[inputs.studentTypeCode]?.multiplier ?? 1.0
