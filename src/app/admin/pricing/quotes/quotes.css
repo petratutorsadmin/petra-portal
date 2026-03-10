@@ -1,0 +1,11 @@
+/* Admin Quote Builder Styles */
+
+.admin-quotes-page .form-row .form-group select[id="market_region"] option[selected],
+.admin-quotes-page select option[selected] {
+    font-weight: 600;
+}
+
+/* Admin-only compensation section */
+.admin-quotes-page .form-row[style*="fef3c7"] {
+    flex-wrap: wrap;
+}

@@ -14,6 +14,7 @@ export default function ClientSidebar() {
                     <li><Link href="/client/browse">Browse Tutors</Link></li>
                     <li><Link href="/client/lessons">Upcoming Lessons</Link></li>
                     <li><Link href="/client/history">Lesson History &amp; Homework</Link></li>
+                    <li><Link href="/client/pricing">My Plan &amp; Pricing</Link></li>
                     <li><Link href="/client/payments">Payments / Invoices</Link></li>
                 </ul>
             </nav>

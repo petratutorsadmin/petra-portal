@@ -1,0 +1,232 @@
+/* Client Pricing Calculator Styles */
+
+.client-pricing-calculator {
+    margin-top: 1.5rem;
+}
+
+.locked-banner {
+    background: #fef3c7;
+    border: 1px solid #fde68a;
+    color: #92400e;
+    padding: 0.75rem 1.25rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    font-weight: 500;
+}
+
+.pricing-layout {
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: 2rem;
+    align-items: start;
+}
+
+@media (max-width: 900px) {
+    .pricing-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+.pricing-controls {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 1.5rem;
+}
+
+.pricing-controls fieldset {
+    border: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.pricing-controls fieldset:disabled {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.control-group label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #475569;
+}
+
+.control-group select {
+    padding: 0.6rem 0.9rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    color: #1e293b;
+    background: #fff;
+    transition: border-color 0.15s;
+}
+
+.control-group select:focus {
+    outline: none;
+    border-color: #7c3aed;
+    box-shadow: 0 0 0 3px rgba(124,58,237,0.1);
+}
+
+.control-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+/* Plan pills */
+.plan-pills {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+}
+
+.plan-pill {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.65rem 0.5rem;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 8px;
+    background: #fff;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: center;
+}
+
+.plan-pill:hover {
+    border-color: #7c3aed;
+}
+
+.plan-pill.active {
+    border-color: #7c3aed;
+    background: #f5f3ff;
+}
+
+.plan-pill-code {
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: #1e293b;
+}
+
+.plan-pill-label {
+    font-size: 0.72rem;
+    color: #64748b;
+}
+
+.plan-pill-mult {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #7c3aed;
+    margin-top: 0.15rem;
+}
+
+/* Result card */
+.pricing-result-card {
+    background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+    border-radius: 16px;
+    padding: 2rem;
+    color: white;
+    position: sticky;
+    top: 1.5rem;
+}
+
+.result-program {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #c4b5fd;
+    margin-bottom: 0.25rem;
+}
+
+.result-plan {
+    font-size: 0.8rem;
+    color: #a5b4fc;
+    margin-bottom: 1.5rem;
+}
+
+.result-price-main,
+.result-price-monthly,
+.result-price-total {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1.25rem;
+}
+
+.result-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #a5b4fc;
+    margin-bottom: 0.2rem;
+}
+
+.result-amount {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.result-amount-lg {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: #ffffff;
+}
+
+.result-amount-xl {
+    font-size: 2.6rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, #a78bfa, #60a5fa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.result-badge {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 20px;
+    padding: 0.4rem 0.9rem;
+    font-size: 0.82rem;
+    color: #bae6fd;
+    margin-bottom: 1.25rem;
+    display: inline-block;
+}
+
+.result-note {
+    font-size: 0.78rem;
+    color: #818cf8;
+    line-height: 1.5;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    padding-top: 1rem;
+    margin-top: 0.5rem;
+}
+
+.result-cta {
+    display: block;
+    margin-top: 1.25rem;
+    padding: 0.75rem;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 8px;
+    text-align: center;
+    color: #e0e7ff;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: background 0.15s;
+}
+
+.result-cta:hover {
+    background: rgba(255,255,255,0.2);
+}

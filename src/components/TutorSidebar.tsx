@@ -14,6 +14,7 @@ export default function TutorSidebar() {
                     <li><Link href="/tutor/availability">My Availability</Link></li>
                     <li><Link href="/tutor/students">My Students</Link></li>
                     <li><Link href="/tutor/lessons">My Lessons</Link></li>
+                    <li><Link href="/tutor/compensation">My Compensation</Link></li>
                     <li><Link href="/tutor/payouts">My Payouts</Link></li>
                 </ul>
             </nav>
