@@ -67,17 +67,29 @@ export async function login(formData: FormData) {
 export async function signup(formData: FormData) {
     const supabase = await createClient()
 
-    const data = {
-        email: formData.get('email') as string,
-        password: formData.get('password') as string,
-    }
+    const email = formData.get('email') as string
+    const password = formData.get('password') as string
+    const firstName = formData.get('first_name') as string
+    const lastName = formData.get('last_name') as string
+    const role = formData.get('role') as string
 
-    const { error } = await supabase.auth.signUp(data)
+    const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+            data: {
+                first_name: firstName,
+                last_name: lastName,
+                role: role,
+            }
+        }
+    })
 
     if (error) {
-        redirect('/login?error=Could not authenticate user')
+        console.error('Signup error:', error)
+        redirect(`/login?error=${encodeURIComponent(error.message)}`)
     }
 
     revalidatePath('/', 'layout')
-    redirect('/login?message=Check email to continue sign in process')
+    redirect('/login?message=Check your email for the confirmation link!')
 }

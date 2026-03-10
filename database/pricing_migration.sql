@@ -10,7 +10,7 @@ ALTER TABLE public.program_categories
   ADD COLUMN IF NOT EXISTS base_price_jpy DECIMAL(10,2) NOT NULL DEFAULT 0;
 
 -- Seed the 11 canonical programs
-TRUNCATE public.program_categories;
+TRUNCATE public.program_categories CASCADE;
 INSERT INTO public.program_categories (code, name, base_price_jpy, description) VALUES
   ('P1',  'Basic Language Support',            3500,  'Foundational language skills, beginner to elementary'),
   ('P2',  'Standard School Support',           3850,  'General school subject curriculum support'),
@@ -121,7 +121,7 @@ ON CONFLICT (size) DO UPDATE SET multiplier = EXCLUDED.multiplier;
 -- ================================================
 -- 8. Re-seed market_multipliers
 -- ================================================
-TRUNCATE public.market_multipliers;
+TRUNCATE public.market_multipliers CASCADE;
 INSERT INTO public.market_multipliers (region_name, multiplier) VALUES
   ('Developing Markets', 0.65),
   ('Emerging Markets',   0.80),
@@ -136,7 +136,7 @@ INSERT INTO public.market_multipliers (region_name, multiplier) VALUES
 -- ================================================
 -- 9. Re-seed currencies
 -- ================================================
-TRUNCATE public.currencies;
+TRUNCATE public.currencies CASCADE;
 INSERT INTO public.currencies (code, exchange_rate) VALUES
   ('JPY', 1.0000),
   ('USD', 0.0067),

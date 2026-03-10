@@ -23,8 +23,8 @@ export default async function AdminQuotesPage({
         { data: quotes },
     ] = await Promise.all([
         supabase.from('program_categories').select('id, code, name, base_price_jpy').order('code'),
-        supabase.from('profiles').select('id, first_name, last_name').eq('role', 'student').order('first_name'),
-        supabase.from('profiles').select('id, first_name, last_name, tutor_profiles(tutor_level, tutor_pay_mode)').eq('role', 'tutor').order('first_name'),
+        supabase.from('profiles').select('id, first_name, last_name, student_profiles!inner(id)').eq('role', 'student').order('first_name'),
+        supabase.from('profiles').select('id, first_name, last_name, tutor_profiles!inner(id, tutor_level, tutor_pay_mode)').eq('role', 'tutor').order('first_name'),
         supabase.from('market_multipliers').select('region_name, multiplier').order('region_name'),
         supabase.from('currencies').select('code, exchange_rate').order('code'),
         supabase.from('topics').select('id, name, category_code').order('name'),
