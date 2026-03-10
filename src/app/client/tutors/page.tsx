@@ -1,6 +1,6 @@
 import { createClient } from '@/utils/supabase/server'
 import Link from 'next/link'
-import '../../admin/users/users.css'
+import '@/app/shared/forms.css'
 
 export default async function ClientTutorsPage() {
     const supabase = await createClient()

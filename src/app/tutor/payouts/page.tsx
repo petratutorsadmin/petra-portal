@@ -1,6 +1,6 @@
 import { createClient } from '@/utils/supabase/server'
 import Link from 'next/link'
-import '../../admin/users/users.css' // Form/Table utility classes
+import '@/app/shared/forms.css' // Form/Table utility classes
 
 export default async function TutorPayoutsPage() {
     const supabase = await createClient()

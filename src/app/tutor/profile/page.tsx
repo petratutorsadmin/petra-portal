@@ -1,21 +1,25 @@
 import { createClient } from '@/utils/supabase/server'
-import Link from 'next/link'
-import '../../admin/users/users.css' // Form styles
+import { updateTutorProfile } from '../actions'
+import '@/app/shared/forms.css'
 
-export default async function TutorProfilePage() {
+export default async function TutorProfilePage({
+    searchParams,
+}: {
+    searchParams: Promise<{ success?: string }>
+}) {
     const supabase = await createClient()
+    const resolvedParams = await searchParams
 
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return null
 
-    // Fetch both profile generic data and tutor specific data
     const { data: profile } = await supabase
         .from('profiles')
         .select('*, tutor_profiles(*)')
         .eq('id', user.id)
         .single()
 
-    const tutorInfo = profile?.tutor_profiles?.[0] || {}
+    const tutorInfo = (profile?.tutor_profiles as any[])?.[0] || {}
 
     return (
         <div className="tutor-profile-page">
@@ -24,11 +28,14 @@ export default async function TutorProfilePage() {
                     <h1>My Profile</h1>
                     <p>Update your public directory information and settings.</p>
                 </div>
-                <button className="btn-primary">Save Profile</button>
             </header>
 
+            {resolvedParams?.success && (
+                <div className="success-banner">✓ Profile saved successfully!</div>
+            )}
+
             <section className="dashboard-section mt-4" style={{ maxWidth: '800px' }}>
-                <form className="admin-form">
+                <form className="admin-form" action={updateTutorProfile}>
                     <div className="form-row">
                         <div className="form-group flex-1">
                             <label htmlFor="first_name">First Name</label>

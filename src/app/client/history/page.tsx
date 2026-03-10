@@ -1,6 +1,6 @@
 import { createClient } from '@/utils/supabase/server'
 import Link from 'next/link'
-import '../../admin/users/users.css' // Reuse form styles
+import '@/app/shared/forms.css' // Reuse form styles
 
 export default async function ClientHistoryPage() {
     const supabase = await createClient()
