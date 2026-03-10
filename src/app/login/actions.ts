@@ -25,24 +25,43 @@ export async function login(formData: FormData) {
 
     console.log('Supabase auth successful. Checking profile...')
 
-    // Check user role to redirect appropriately
-    const { data: { user } } = await supabase.auth.getUser()
-    if (user) {
-        const { data: profile } = await supabase
-            .from('profiles')
-            .select('role')
-            .eq('id', user.id)
-            .single()
+    let redirectUrl = '/' // Default
 
-        if (profile) {
-            if (profile.role === 'admin') redirect('/admin')
-            if (profile.role === 'tutor') redirect('/tutor')
-            if (profile.role === 'student' || profile.role === 'parent') redirect('/client')
+    try {
+        const { data: { user }, error: userError } = await supabase.auth.getUser()
+
+        if (userError) {
+            console.error('Supabase getUser error:', userError)
+            throw userError
         }
+
+        if (user) {
+            const { data: profile, error: profileError } = await supabase
+                .from('profiles')
+                .select('role')
+                .eq('id', user.id)
+                .single()
+
+            if (profileError) {
+                console.error('Supabase profile fetch error:', profileError)
+                // We don't throw here, we just let them go to '/' where they might see an error or default state
+            }
+
+            if (profile) {
+                if (profile.role === 'admin') redirectUrl = '/admin'
+                if (profile.role === 'tutor') redirectUrl = '/tutor'
+                if (profile.role === 'student' || profile.role === 'parent') redirectUrl = '/client'
+            } else {
+                console.log('No profile found. Defaulting to /')
+            }
+        }
+    } catch (err) {
+        console.error('Unexpected error during login role resolution:', err)
+        redirect('/login?error=An unexpected error occurred during login.')
     }
 
     revalidatePath('/', 'layout')
-    redirect('/')
+    redirect(redirectUrl)
 }
 
 export async function signup(formData: FormData) {
