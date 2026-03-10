@@ -1,7 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
 import Link from 'next/link'
 import { submitReport } from './actions'
-import '../../../../admin/users/users.css' // Import shared form styles
+import '@/app/shared/forms.css' // Import shared form styles
 import { notFound } from 'next/navigation'
 
 export default async function SubmitReportPage({

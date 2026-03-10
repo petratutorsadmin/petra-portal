@@ -1,5 +1,6 @@
 import { createClient } from '@/utils/supabase/server'
 import Link from 'next/link'
+import { approveMatch, rejectMatch } from './actions'
 import './admin.css'
 
 export default async function AdminDashboard() {
@@ -94,7 +95,22 @@ export default async function AdminDashboard() {
                                         <td>{student ? `${student.first_name} ${student.last_name}` : 'Unknown'}</td>
                                         <td>{tutor ? `${tutor.first_name} ${tutor.last_name}` : 'Any Available'}</td>
                                         <td><span className={`badge ${statusColor}`}>{match.status}</span></td>
-                                        <td><Link href="/admin/users" className="btn-small">Review</Link></td>
+                                        <td>
+                                            {match.status === 'pending' ? (
+                                                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                                    <form action={approveMatch} style={{ display: 'inline' }}>
+                                                        <input type="hidden" name="match_id" value={match.id} />
+                                                        <button type="submit" className="btn-small" style={{ background: '#dcfce3', color: '#166534', borderColor: '#bbf7d0' }}>✓ Approve</button>
+                                                    </form>
+                                                    <form action={rejectMatch} style={{ display: 'inline' }}>
+                                                        <input type="hidden" name="match_id" value={match.id} />
+                                                        <button type="submit" className="btn-small" style={{ color: '#dc2626', borderColor: '#fca5a5' }}>✕ Reject</button>
+                                                    </form>
+                                                </div>
+                                            ) : (
+                                                <span style={{ fontSize: '0.85rem', color: '#94a3b8' }}>—</span>
+                                            )}
+                                        </td>
                                     </tr>
                                 )
                             })}
