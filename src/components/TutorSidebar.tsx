@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { logout } from '@/app/actions/auth'
 
 export default function TutorSidebar() {
     return (
@@ -14,9 +15,13 @@ export default function TutorSidebar() {
                     <li><Link href="/tutor/students">My Students</Link></li>
                     <li><Link href="/tutor/lessons">My Lessons</Link></li>
                     <li><Link href="/tutor/payouts">My Payouts</Link></li>
-                    <li><Link href="/tutor/support">Support Request</Link></li>
                 </ul>
             </nav>
+            <div className="sidebar-footer">
+                <form action={logout}>
+                    <button type="submit" className="logout-btn">Sign Out</button>
+                </form>
+            </div>
         </aside>
     )
 }
