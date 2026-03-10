@@ -1,4 +1,5 @@
 import { createClient } from '@/utils/supabase/server'
+import { requestMatch } from './actions'
 
 export default async function ClientBrowsePage() {
     const supabase = await createClient()
@@ -50,7 +51,9 @@ export default async function ClientBrowsePage() {
                                     <p style={{ fontSize: '0.95rem', color: '#4b5563', lineHeight: 1.5, flex: 1 }}>{t.bio}</p>
 
                                     <div style={{ marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid #f3f4f6' }}>
-                                        <button className="btn-primary" style={{ width: '100%' }}>Request Match</button>
+                                        <form action={requestMatch.bind(null, t.id, name, t.curriculum_expertise?.[0] || 'General Tutoring')}>
+                                            <button type="submit" className="btn-primary" style={{ width: '100%' }}>Request Match (Test Calendar Sync)</button>
+                                        </form>
                                     </div>
                                 </div>
                             )
