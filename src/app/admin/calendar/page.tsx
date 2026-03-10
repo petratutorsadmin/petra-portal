@@ -28,7 +28,7 @@ export default async function AdminCalendarPage({
                     <h1>Master Calendar</h1>
                     <p>Admin scheduling master view for all lessons and trials.</p>
                 </div>
-                <button className="btn-primary">+ Schedule Lesson</button>
+                <Link href="/admin/calendar/new" className="btn-primary">+ Schedule Lesson</Link>
             </header>
 
             <div className="tabs">
