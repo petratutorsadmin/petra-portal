@@ -105,20 +105,24 @@ export default async function TutorCompensationPage() {
                 <p>Your pay per lesson and estimated monthly earnings. Client prices and Petra margins are not shown here.</p>
             </header>
 
-            {/* Pay tier summary card */}
+            {/* Pay summary cards */}
             <div className="dashboard-grid" style={{ marginTop: '1.5rem' }}>
                 <div className="stat-card">
-                    <h3>Your Pay Tier</h3>
-                    <p className="stat-number" style={{ fontSize: '1.8rem' }}>Level {tutorLevel}</p>
+                    <h3>Your Base Rate</h3>
+                    <p className="stat-number" style={{ fontSize: '1.8rem', color: '#0f172a' }}>
+                        {formatCurrency(rates[tutorPayMode === 'min' ? 0 : tutorPayMode === 'standard' ? 1 : 2])}
+                    </p>
                     <p style={{ color: '#64748b', fontSize: '0.85rem', marginTop: '0.5rem' }}>
-                        ¥{rates[0].toLocaleString()} – ¥{rates[2].toLocaleString()} / 60 min
+                        Per standard 60-minute lesson.
                     </p>
                 </div>
                 <div className="stat-card">
-                    <h3>Your Pay Mode</h3>
-                    <p className="stat-number" style={{ fontSize: '1.8rem', textTransform: 'capitalize' }}>{tutorPayMode}</p>
+                    <h3>Current Pay Bracket</h3>
+                    <p className="stat-number" style={{ fontSize: '1.4rem', color: '#475569', marginTop: '0.2rem' }}>
+                        {formatCurrency(rates[0])} – {formatCurrency(rates[2])}
+                    </p>
                     <p style={{ color: '#64748b', fontSize: '0.85rem', marginTop: '0.5rem' }}>
-                        Base: {formatCurrency(rates[tutorPayMode === 'min' ? 0 : tutorPayMode === 'standard' ? 1 : 2])} / 60 min
+                        Growth potential based on performance.
                     </p>
                 </div>
                 <div className="stat-card" style={{ borderColor: '#bbf7d0', background: '#f0fdf4' }}>
@@ -171,7 +175,7 @@ export default async function TutorCompensationPage() {
 
             <div className="dashboard-section" style={{ marginTop: '1.5rem', background: '#f8fafc' }}>
                 <p style={{ fontSize: '0.85rem', color: '#64748b' }}>
-                    💡 Pay is calculated based on your current level and pay mode. Delivery bonuses are added per lesson (e.g. in-person lessons include a travel supplement). Contact Petra admin if you believe your level should be updated.
+                    💡 Base pay is evaluated against continuous performance metrics, reliability, and pedagogical quality. Delivery bonuses are dynamically calculated per lesson (e.g., in-person lessons include a travel supplement).
                 </p>
             </div>
         </div>

@@ -69,10 +69,19 @@ async function seed() {
         await supabase.from('profiles').update({ role: 'student', first_name: 'Sam', last_name: 'Smith', timezone: 'Asia/Tokyo' }).eq('id', studentId)
         await supabase.from('student_profiles').insert({
             id: studentId,
-            grade_level: 10,
-            school_name: 'Tokyo International School',
-            assigned_plan: 'Standard Tier 1'
+            status: 'active',
+            assigned_plan: 'Standard Tier 1',
+            current_xp: 750,
+            current_level: 2
         })
+
+        // 4. Create initial Tasks for the Student
+        console.log('Adding sample tasks...')
+        await supabase.from('student_tasks').insert([
+            { student_id: studentId, title: 'Read "The Great Gatsby" Chapter 1', xp_reward: 50, status: 'pending' },
+            { student_id: studentId, title: 'Complete Calculus Exercise 3.2', xp_reward: 100, status: 'pending' },
+            { student_id: studentId, title: 'Practice Pronunciation: "Th" sounds', xp_reward: 50, status: 'pending' }
+        ])
 
         // Create an active match if both tutor and student exist
         if (tutorAuth?.user) {
