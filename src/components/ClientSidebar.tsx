@@ -12,11 +12,13 @@ export default function ClientSidebar() {
                     <li><Link href="/client">Dashboard</Link></li>
                     <li><Link href="/client/app">▶ Briefing</Link></li>
                     <li><Link href="/client/training">◈ Training</Link></li>
-                    <li><Link href="/client/tutors">My Tutors</Link></li>
-                    <li><Link href="/client/browse">Browse Tutors</Link></li>
                     <li><Link href="/client/lessons">Upcoming Lessons</Link></li>
                     <li><Link href="/client/history">Lesson History &amp; Homework</Link></li>
+                    <li><Link href="/client/tutors">My Tutors</Link></li>
+                    <li><Link href="/client/browse">Browse Tutors</Link></li>
+                    <li><Link href="/client/programs">My Programs</Link></li>
                     <li><Link href="/client/pricing">My Plan &amp; Pricing</Link></li>
+                    <li><Link href="/client/pricing-estimator">Pricing Estimator</Link></li>
                     <li><Link href="/client/payments">Payments / Invoices</Link></li>
                 </ul>
             </nav>
