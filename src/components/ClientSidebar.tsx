@@ -10,6 +10,8 @@ export default function ClientSidebar() {
             <nav className="client-nav">
                 <ul>
                     <li><Link href="/client">Dashboard</Link></li>
+                    <li><Link href="/client/app">▶ Briefing</Link></li>
+                    <li><Link href="/client/training">◈ Training</Link></li>
                     <li><Link href="/client/tutors">My Tutors</Link></li>
                     <li><Link href="/client/browse">Browse Tutors</Link></li>
                     <li><Link href="/client/lessons">Upcoming Lessons</Link></li>
