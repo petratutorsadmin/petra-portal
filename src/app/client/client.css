@@ -213,3 +213,65 @@
     background-color: #f3f4f6;
     color: #111827;
 }
+
+@media (max-width: 767px) {
+    .client-layout {
+        flex-direction: column;
+        padding-bottom: 65px;
+    }
+
+    .client-sidebar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100vw;
+        height: auto;
+        border-right: none;
+        border-top: 1px solid #e5e5e5;
+        z-index: 1000;
+        flex-direction: row;
+        display: flex;
+    }
+
+    .client-sidebar-header, .sidebar-footer {
+        display: none;
+    }
+
+    .client-nav {
+        padding: 0;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch; /* Smoother momentum scrolling */
+    }
+
+    .client-nav ul {
+        display: flex;
+        flex-direction: row;
+    }
+
+    .client-nav li a {
+        padding: 1rem;
+        font-size: 0.85rem;
+        white-space: nowrap;
+        border-left: none;
+        border-bottom: 3px solid transparent;
+        display: inline-block;
+    }
+
+    .client-nav li a:hover,
+    .client-nav li a.active {
+        border-left: none;
+        border-bottom: 3px solid #2563eb;
+    }
+    
+    .client-main {
+        padding: 1.25rem 1rem 5rem 1rem;
+        height: 100vh;
+        overflow-y: auto;
+        overscroll-behavior-y: contain; /* Prevents rubber-banding of the whole page */
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .dashboard-grid, .dashboard-splits {
+        grid-template-columns: 1fr;
+    }
+}

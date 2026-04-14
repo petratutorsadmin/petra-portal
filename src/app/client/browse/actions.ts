@@ -12,6 +12,9 @@ export async function requestMatch(tutorId: string, tutorName: string, subjectPr
         throw new Error('User not authenticated')
     }
 
+    // Ensure student_profile exists to satisfy foreign key constraint before match request
+    await supabase.from('student_profiles').upsert({ id: user.id }, { onConflict: 'id' })
+
     // 1. Create a Match Request
     const { error: matchError } = await supabase
         .from('match_requests')

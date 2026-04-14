@@ -166,3 +166,141 @@
     border-color: #94a3b8;
     color: #0f172a;
 }
+
+@media (max-width: 767px) {
+    .tutor-layout {
+        flex-direction: column;
+        padding-bottom: 65px;
+    }
+
+    .tutor-sidebar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100vw;
+        height: auto;
+        border-right: none;
+        border-top: 1px solid #e2e8f0;
+        z-index: 1000;
+        flex-direction: row;
+        display: flex;
+    }
+
+    .tutor-sidebar-header, .sidebar-footer {
+        display: none;
+    }
+
+    .tutor-nav {
+        padding: 0;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .tutor-nav ul {
+        display: flex;
+        flex-direction: row;
+    }
+
+    .tutor-nav li a {
+        padding: 1rem;
+        font-size: 0.85rem;
+        white-space: nowrap;
+        border-left: none;
+        border-bottom: 3px solid transparent;
+        display: inline-block;
+    }
+
+    .tutor-nav li a:hover,
+    .tutor-nav li a.active {
+        border-left: none;
+        border-bottom: 3px solid #3b82f6;
+    }
+    
+    .tutor-main {
+        padding: 1.25rem;
+    }
+    
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+
+    /* Table to Card Conversion Strategy */
+    .data-table, .data-table tbody, .data-table tr, .data-table td {
+        display: block;
+        width: 100%;
+    }
+    .data-table thead {
+        display: none;
+    }
+    .data-table tr {
+        margin-bottom: 1rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 1rem;
+        background: #ffffff;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+    .data-table td {
+        border-bottom: none;
+        padding: 0.25rem 0;
+        text-align: left;
+    }
+    /* Action items (like Remove button) naturally sit at the bottom */
+    .data-table td:last-child {
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px dashed #e2e8f0;
+        text-align: right;
+    }
+}
+
+/* === Phase 4: iPad / Tablet Nav (768px - 1023px) === */
+@media (min-width: 768px) and (max-width: 1023px) {
+    .tutor-sidebar {
+        width: 80px; /* Narrow side rail */
+        align-items: center;
+    }
+    .tutor-sidebar-header h2 {
+        display: none;
+    }
+    .tutor-nav li a {
+        font-size: 0; /* Hide text, rely on layout */
+        text-align: center;
+        padding: 1.5rem;
+    }
+    .sidebar-footer .logout-btn {
+        font-size: 0;
+        padding: 1rem;
+    }
+}
+
+/* === iPad Split View Utility === */
+.tablet-split-view {
+    display: grid;
+    gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+    .tablet-split-view {
+        grid-template-columns: 320px 1fr;
+        height: calc(100vh - 8rem);
+    }
+    .tablet-split-list {
+        border-right: 1px solid #e2e8f0;
+        padding-right: 1.5rem;
+        overflow-y: auto;
+    }
+    .tablet-split-detail {
+        padding-left: 0.5rem;
+        overflow-y: auto;
+    }
+}
+
+@media (max-width: 767px) {
+    .tablet-split-view {
+        grid-template-columns: 1fr;
+    }
+    .tablet-split-list {
+        display: none; /* Auto-hide list when detail is active on mobile */
+    }
+}

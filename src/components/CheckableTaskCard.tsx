@@ -6,11 +6,14 @@ export default function CheckableTaskCard({ task, onComplete }: { task: any, onC
     const [isCompleting, setIsCompleting] = useState(false)
     const [isDone, setIsDone] = useState(task.status === 'completed')
 
-    const handleClick = async () => {
+    const handleClick = () => {
         if (isDone || isCompleting) return
         setIsCompleting(true)
-        await onComplete(task.id)
-        setIsDone(true)
+        // Optimistic update: trigger Server Action without awaiting
+        onComplete(task.id).catch(console.error)
+        
+        // Let the 300ms opacity transition finish before unmounting
+        setTimeout(() => setIsDone(true), 300)
     }
 
     if (isDone) return null // Hide once complete
@@ -25,8 +28,9 @@ export default function CheckableTaskCard({ task, onComplete }: { task: any, onC
             borderRadius: '12px', 
             border: '1px solid #e2e8f0',
             boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
-            opacity: isCompleting ? 0.5 : 1,
-            transition: 'opacity 0.3s ease'
+            opacity: isCompleting ? 0 : 1,
+            transform: isCompleting ? 'scale(0.98)' : 'scale(1)',
+            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
         }}>
             <div>
                 <h4 style={{ margin: 0, fontSize: '1rem', color: '#0f172a' }}>{task.title}</h4>

@@ -18,7 +18,7 @@ export default function LevelProgressBar({ currentXp, currentLevel }: { currentX
                         strokeDashoffset={339.29 - (progressPercent / 100) * 339.29} 
                         strokeLinecap="round"
                         transform="rotate(-90 60 60)"
-                        style={{ transition: 'stroke-dashoffset 1s ease-out' }}
+                        style={{ transition: 'stroke-dashoffset 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)' }}
                     />
                 </svg>
                 <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>

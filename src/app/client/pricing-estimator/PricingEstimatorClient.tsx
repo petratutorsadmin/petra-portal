@@ -37,6 +37,7 @@ export default function PricingEstimatorClient({ initialProgram }: { initialProg
     const [deliveryCode, setDeliveryCode] = useState('online')
     const [studentTypeCode, setStudentTypeCode] = useState('adult')
     const [groupSize, setGroupSize] = useState(1)
+    const [currency, setCurrency] = useState('JPY')
 
     const toggleTopic = (name: string) => {
         setSelectedTopics(prev => 
@@ -55,6 +56,8 @@ export default function PricingEstimatorClient({ initialProgram }: { initialProg
         studentTypeCode,
         marketRegion: 'Japan Baseline',
         groupSize,
+        currencyCode: currency,
+        exchangeRate: currency === 'USD' ? 0.0066 : (currency === 'EUR' ? 0.0061 : (currency === 'GBP' ? 0.0052 : 1.0))
     })
 
     const planMonths = PLAN_MULTIPLIERS[planCode]?.months ?? 1
@@ -165,6 +168,17 @@ export default function PricingEstimatorClient({ initialProgram }: { initialProg
                             </select>
                         </div>
                     </div>
+                    <div className="control-row">
+                        <div className="control-group" style={{ flex: 'none', width: '50%' }}>
+                            <label>Display Currency</label>
+                            <select value={currency} onChange={e => setCurrency(e.target.value)}>
+                                <option value="JPY">JPY (¥)</option>
+                                <option value="USD">USD ($)</option>
+                                <option value="EUR">EUR (€)</option>
+                                <option value="GBP">GBP (£)</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
 
                 {/* ── RIGHT: Result ── */}
@@ -179,17 +193,17 @@ export default function PricingEstimatorClient({ initialProgram }: { initialProg
 
                     <div className="result-price-main">
                         <span className="result-label">Per Lesson</span>
-                        <span className="result-amount">{formatCurrency(result.clientPricePerLessonJpy)}</span>
+                        <span className="result-amount">{formatCurrency(result.clientPriceConverted, result.currencyCode)}</span>
                     </div>
 
                     <div className="result-price-monthly">
                         <span className="result-label">Monthly Tuition</span>
-                        <span className="result-amount-lg">{formatCurrency(result.clientMonthlyJpy)}</span>
+                        <span className="result-amount-lg">{formatCurrency(result.clientMonthlyConverted, result.currencyCode)}</span>
                     </div>
 
                     <div className="result-price-total">
                         <span className="result-label">Plan Total</span>
-                        <span className="result-amount-xl">{formatCurrency(planTotal)}</span>
+                        <span className="result-amount-xl">{formatCurrency(planMonths > 0 ? result.clientMonthlyConverted * planMonths : result.clientMonthlyConverted, result.currencyCode)}</span>
                     </div>
 
                     <div className="result-note">
