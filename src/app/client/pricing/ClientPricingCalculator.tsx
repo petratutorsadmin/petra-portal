@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState } from 'react'
+import Link from 'next/link'
 import {
     calculateClientPrice,
     formatCurrency,
@@ -50,7 +51,6 @@ export default function ClientPricingCalculator({ isLocked, currentPlanCode }: P
     })
 
     const planMonths = PLAN_MULTIPLIERS[planCode]?.months ?? 1
-    const planTotal = planMonths > 0 ? result.clientMonthlyJpy * planMonths : result.clientMonthlyJpy
 
     return (
         <div className="client-pricing-calculator">
@@ -164,7 +164,7 @@ export default function ClientPricingCalculator({ isLocked, currentPlanCode }: P
                     {planMonths > 0 && (
                         <div className="result-price-total">
                             <span className="result-label">Plan Total ({planMonths} month{planMonths > 1 ? 's' : ''})</span>
-                            <span className="result-amount-xl">{formatCurrency(planTotal)}</span>
+                            <span className="result-amount-xl">{formatCurrency(planMonths > 0 ? result.clientMonthlyJpy * planMonths : result.clientMonthlyJpy)}</span>
                         </div>
                     )}
 
@@ -179,7 +179,7 @@ export default function ClientPricingCalculator({ isLocked, currentPlanCode }: P
                     </div>
 
                     {!isLocked && (
-                        <a href="/client/contact" className="result-cta">Request a Personalised Quote →</a>
+                        <Link href="/client/browse" className="result-cta">Request a Personalised Quote →</Link>
                     )}
                 </div>
             </div>
