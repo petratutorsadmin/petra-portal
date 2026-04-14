@@ -45,8 +45,10 @@ export default function PricingEstimatorClient({ initialProgram }: { initialProg
         )
     }
 
-    // Calculate live price
-    const result = calculateClientPrice({
+    // Guard: only calculate when we have valid input
+    const canCalculate = mode === 'structured' || (mode === 'topics' && selectedTopics.length > 0)
+
+    const result = canCalculate ? calculateClientPrice({
         programCode: mode === 'structured' ? programCode : undefined,
         topics: mode === 'topics' ? selectedTopics : undefined,
         lessonMinutes,
@@ -58,10 +60,9 @@ export default function PricingEstimatorClient({ initialProgram }: { initialProg
         groupSize,
         currencyCode: currency,
         exchangeRate: currency === 'USD' ? 0.0066 : (currency === 'EUR' ? 0.0061 : (currency === 'GBP' ? 0.0052 : 1.0))
-    })
+    }) : null
 
     const planMonths = PLAN_MULTIPLIERS[planCode]?.months ?? 1
-    const planTotal = planMonths > 0 ? result.clientMonthlyJpy * planMonths : result.clientMonthlyJpy
 
     return (
         <div className="client-pricing-estimator">
@@ -191,26 +192,35 @@ export default function PricingEstimatorClient({ initialProgram }: { initialProg
                                 : 'Choose some topics...'}
                     </div>
 
-                    <div className="result-price-main">
-                        <span className="result-label">Per Lesson</span>
-                        <span className="result-amount">{formatCurrency(result.clientPriceConverted, result.currencyCode)}</span>
-                    </div>
+                    {result ? (
+                        <>
+                        <div className="result-price-main">
+                            <span className="result-label">Per Lesson</span>
+                            <span className="result-amount">{formatCurrency(result.clientPriceConverted, result.currencyCode)}</span>
+                        </div>
 
-                    <div className="result-price-monthly">
-                        <span className="result-label">Monthly Tuition</span>
-                        <span className="result-amount-lg">{formatCurrency(result.clientMonthlyConverted, result.currencyCode)}</span>
-                    </div>
+                        <div className="result-price-monthly">
+                            <span className="result-label">Monthly Tuition</span>
+                            <span className="result-amount-lg">{formatCurrency(result.clientMonthlyConverted, result.currencyCode)}</span>
+                        </div>
 
-                    <div className="result-price-total">
-                        <span className="result-label">Plan Total</span>
-                        <span className="result-amount-xl">{formatCurrency(planMonths > 0 ? result.clientMonthlyConverted * planMonths : result.clientMonthlyConverted, result.currencyCode)}</span>
-                    </div>
+                        <div className="result-price-total">
+                            <span className="result-label">Plan Total</span>
+                            <span className="result-amount-xl">{formatCurrency(planMonths > 0 ? result.clientMonthlyConverted * planMonths : result.clientMonthlyConverted, result.currencyCode)}</span>
+                        </div>
+                        </>
+                    ) : (
+                        <div style={{ padding: '2rem 0', textAlign: 'center', color: '#94a3b8' }}>
+                            <p style={{ margin: 0, fontWeight: 600 }}>Select topics above</p>
+                            <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.875rem' }}>to see estimated pricing.</p>
+                        </div>
+                    )}
 
                     <div className="result-note">
                         Final pricing will be confirmed after your personal tutor match.
                     </div>
 
-                    <Link href="/client/support" className="result-cta">Request Final Quote →</Link>
+                    <Link href="/client/browse" className="result-cta">Request Final Quote →</Link>
                 </div>
             </div>
         </div>
