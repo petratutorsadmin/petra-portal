@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
 import ClientSidebar from '@/components/ClientSidebar'
+import './client.css'
 
 export default async function ClientLayout({
     children,

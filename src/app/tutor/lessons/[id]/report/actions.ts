@@ -4,19 +4,22 @@ import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
-export async function submitReport(formData: FormData) {
+export interface StructuredReportPayload {
+    lesson_id: string;
+    student_id: string;
+    core_feedback: string;
+    skills: Record<string, number>;
+    bonus_xp: number;
+    tasks: string[];
+}
+
+export async function submitStructuredReport(payload: StructuredReportPayload) {
     const supabase = await createClient()
 
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) redirect('/login')
 
-    const lesson_id = formData.get('lesson_id') as string
-    const student_id = formData.get('student_id') as string
-    const topics_covered = formData.get('topics_covered') as string
-    const student_visible_comments = formData.get('student_visible_comments') as string
-    const admin_only_notes = formData.get('admin_only_notes') as string
-    const student_engagement_rating = parseInt(formData.get('student_engagement_rating') as string) || 3
-    const task_description = formData.get('task_description') as string
+    const { lesson_id, student_id, core_feedback, skills, bonus_xp, tasks } = payload
 
     // 1. Insert Lesson Report
     const { error: reportError } = await supabase
@@ -24,29 +27,39 @@ export async function submitReport(formData: FormData) {
         .insert({
             lesson_id,
             tutor_id: user.id,
-            topics_covered,
-            student_visible_comments,
-            admin_only_notes,
-            student_engagement_rating
+            student_visible_comments: core_feedback,
+            skill_increments: skills,
+            xp_awarded: bonus_xp
         })
 
     if (reportError) {
         console.error('Error submitting report:', reportError)
-        // Normally handle error state, for scaffolding just redirect
-        redirect(`/tutor/lessons/${lesson_id}/report?error=submission_failed`)
+        return { success: false, error: reportError.message }
     }
 
-    // 2. Assign Homework if provided
-    if (task_description && task_description.trim() !== '') {
-        await supabase.from('homework_items').insert({
+    // 2. Assign Homework (Tasks)
+    if (tasks && tasks.length > 0) {
+        const taskInserts = tasks.map(t => ({
             lesson_id,
             student_id,
-            task_description,
-            status: 'assigned'
-        })
+            tutor_id: user.id,
+            title: t,
+            xp_reward: 50,
+            status: 'pending'
+        }))
+        const { error: taskError } = await supabase.from('student_tasks').insert(taskInserts)
+        if (taskError) console.error("Task insert error:", taskError)
     }
 
-    // 3. Update Lesson Status to 'completed'
+    // 3. Update Student XP
+    // Note: direct "UPDATE + X" requires an RPC. As a stopgap, we fetch current, then update.
+    const { data: profile } = await supabase.from('student_profiles').select('current_xp').eq('id', student_id).single()
+    if (profile) {
+        const newXp = (profile.current_xp || 0) + 100 + bonus_xp // Base 100 XP + Bonus
+        await supabase.from('student_profiles').update({ current_xp: newXp }).eq('id', student_id)
+    }
+
+    // 4. Update Lesson Status
     await supabase.from('lessons')
         .update({ status: 'completed' })
         .eq('id', lesson_id)

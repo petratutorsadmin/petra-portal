@@ -43,6 +43,8 @@ CREATE TABLE public.student_profiles (
   id UUID REFERENCES public.profiles(id) ON DELETE CASCADE PRIMARY KEY,
   status trial_status DEFAULT 'inquiry_received',
   assigned_plan TEXT,
+  current_xp INT DEFAULT 0,
+  current_level INT DEFAULT 1,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -194,6 +196,8 @@ CREATE TABLE public.lesson_reports (
   admin_only_notes TEXT,
   student_engagement_rating INT, -- 1-5
   attendance_notes TEXT,
+  xp_awarded INT DEFAULT 0,
+  skill_increments JSONB DEFAULT '{}'::jsonb,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 ALTER TABLE public.lesson_reports ENABLE ROW LEVEL SECURITY;
@@ -209,6 +213,22 @@ CREATE TABLE public.homework_items (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 ALTER TABLE public.homework_items ENABLE ROW LEVEL SECURITY;
+
+CREATE TABLE public.student_tasks (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  student_id UUID REFERENCES public.student_profiles(id) ON DELETE CASCADE,
+  tutor_id UUID REFERENCES public.tutor_profiles(id) ON DELETE SET NULL,
+  lesson_id UUID REFERENCES public.lessons(id) ON DELETE SET NULL,
+  title TEXT NOT NULL,
+  description TEXT,
+  xp_reward INT DEFAULT 50,
+  due_date TIMESTAMPTZ,
+  status TEXT DEFAULT 'pending', -- pending, completed, overdue, dropped
+  completed_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+ALTER TABLE public.student_tasks ENABLE ROW LEVEL SECURITY;
 
 -- 16. Invoices & Payments (Admin managed)
 CREATE TABLE public.invoices (
@@ -351,3 +371,8 @@ CREATE POLICY "Admins manage all invoices" ON public.invoices USING (public.is_a
 
 -- Default safety: for tables not explicitly granting to others, assume only admin or owner.
 -- This ensures strict requirements met.
+
+-- Student Tasks: Students manage own. Tutors manage assigned. Admins full access.
+CREATE POLICY "Students manage own tasks" ON public.student_tasks FOR ALL USING (student_id = auth.uid());
+CREATE POLICY "Tutors manage assigned tasks" ON public.student_tasks FOR ALL USING (tutor_id = auth.uid());
+CREATE POLICY "Admins full access" ON public.student_tasks FOR ALL USING (public.is_admin());

@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
 import TutorSidebar from '@/components/TutorSidebar'
+import './tutor.css'
 
 export default async function TutorLayout({
     children,

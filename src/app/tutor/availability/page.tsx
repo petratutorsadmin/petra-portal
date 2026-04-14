@@ -1,13 +1,18 @@
 import { createClient } from '@/utils/supabase/server'
 import { addAvailabilityRule, removeAvailabilityRule } from '../actions'
+import { redirect } from 'next/navigation'
 import '@/app/shared/forms.css'
 
 export default async function TutorAvailabilityPage() {
     const supabase = await createClient()
 
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return redirect('/login')
+
     const { data: rules } = await supabase
         .from('tutor_availability_rules')
         .select('*')
+        .eq('tutor_id', user.id)
         .order('day_of_week')
 
     const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']

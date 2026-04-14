@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
 import AdminSidebar from '@/components/AdminSidebar'
+import './admin.css'
 
 export default async function AdminLayout({
     children,

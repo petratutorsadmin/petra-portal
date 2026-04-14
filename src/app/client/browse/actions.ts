@@ -14,10 +14,11 @@ export async function requestMatch(tutorId: string, tutorName: string, subjectPr
 
     // 1. Create a Match Request
     const { error: matchError } = await supabase
-        .from('lesson_requests')
+        .from('match_requests')
         .insert({
             student_id: user.id,
-            tutor_id: tutorId,
+            preferred_tutor_id: tutorId,
+            request_text: `Interested in ${subjectProgram}`,
             status: 'pending' // Admin needs to approve
         })
 
