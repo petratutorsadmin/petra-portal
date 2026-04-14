@@ -4,13 +4,19 @@ import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
+export interface TaskPayload {
+    title: string;
+    type: 'standard' | 'study_session';
+    libraryId?: string;
+}
+
 export interface StructuredReportPayload {
     lesson_id: string;
     student_id: string;
     core_feedback: string;
     skills: Record<string, number>;
     bonus_xp: number;
-    tasks: string[];
+    tasks: TaskPayload[];
 }
 
 export async function submitStructuredReport(payload: StructuredReportPayload) {
@@ -37,14 +43,16 @@ export async function submitStructuredReport(payload: StructuredReportPayload) {
         return { success: false, error: reportError.message }
     }
 
-    // 2. Assign Homework (Tasks)
+    // 2. Assign Tasks (standard checkboxes OR study session triggers)
     if (tasks && tasks.length > 0) {
         const taskInserts = tasks.map(t => ({
             lesson_id,
             student_id,
             tutor_id: user.id,
-            title: t,
-            xp_reward: 50,
+            title: t.title,
+            task_type: t.type ?? 'standard',
+            linked_library_id: t.libraryId ?? null,
+            xp_reward: t.type === 'study_session' ? 100 : 50,
             status: 'pending'
         }))
         const { error: taskError } = await supabase.from('student_tasks').insert(taskInserts)

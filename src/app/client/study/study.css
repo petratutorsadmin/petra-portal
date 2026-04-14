@@ -1,0 +1,229 @@
+/* src/app/client/study/study.css */
+
+/* ========================
+   STUDY ENGINE CONTAINER
+   ======================== */
+.study-engine {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 7rem 1rem;
+  min-height: 100vh;
+  background: #0f172a;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* ========================
+   PROGRESS BAR
+   ======================== */
+.study-progress-track {
+  width: 100%;
+  height: 3px;
+  background: #1e293b;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.study-progress-fill {
+  height: 100%;
+  background: #8b5cf6;
+  transition: width 0.3s ease;
+}
+
+/* ========================
+   COUNTER
+   ======================== */
+.study-counter {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #475569;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+/* ========================
+   FLASHCARD
+   ======================== */
+.study-card {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 16px;
+  padding: 2.5rem 2rem;
+  min-height: 260px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: border-color 0.2s;
+  user-select: none;
+}
+
+.study-card:hover {
+  border-color: #475569;
+}
+
+.card-face {
+  font-size: 1.375rem;
+  font-weight: 700;
+  color: #f8fafc;
+  text-align: center;
+  line-height: 1.4;
+}
+
+.card-face.back {
+  color: #e2e8f0;
+  font-weight: 500;
+  font-size: 1.125rem;
+}
+
+.card-divider {
+  width: 40px;
+  height: 1px;
+  background: #334155;
+  margin: 1.5rem 0;
+}
+
+.card-hint {
+  margin-top: 1rem;
+  font-size: 0.875rem;
+  color: #64748b;
+  text-align: center;
+  font-style: italic;
+}
+
+.card-tap-prompt {
+  margin-top: 2rem;
+  font-size: 0.75rem;
+  color: #475569;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+/* ========================
+   GRADE BUTTONS
+   ======================== */
+.grade-buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+}
+
+.grade-btn {
+  padding: 1rem 0.5rem;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+  letter-spacing: 0.02em;
+  min-height: 56px;
+}
+
+.grade-btn:active {
+  transform: scale(0.96);
+}
+
+.grade-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.grade-btn.again  { background: #1e293b; color: #f87171; border: 1px solid #f87171; }
+.grade-btn.hard   { background: #1e293b; color: #fb923c; border: 1px solid #fb923c; }
+.grade-btn.good   { background: #1e293b; color: #34d399; border: 1px solid #34d399; }
+.grade-btn.easy   { background: #8b5cf6; color: #ffffff; border: 1px solid #8b5cf6; }
+
+/* ========================
+   POST-SESSION DEBRIEF
+   ======================== */
+.study-debrief {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem;
+  min-height: 100vh;
+  background: #0f172a;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2.5rem;
+}
+
+.debrief-matrix {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid #1e293b;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.matrix-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #1e293b;
+  background: #0f172a;
+}
+
+.matrix-row:last-child {
+  border-bottom: none;
+}
+
+.matrix-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #475569;
+}
+
+.matrix-value {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #f8fafc;
+  letter-spacing: -0.02em;
+}
+
+.matrix-value.green  { color: #34d399; }
+.matrix-value.purple { color: #a78bfa; }
+
+.debrief-cta {
+  display: inline-block;
+  padding: 1rem 2rem;
+  background: #8b5cf6;
+  color: white;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 0.01em;
+  transition: opacity 0.2s;
+}
+
+.debrief-cta:hover { opacity: 0.85; }
+
+/* ========================
+   EMPTY STATE
+   ======================== */
+.study-empty {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 4rem 1.5rem;
+  min-height: 100vh;
+  background: #0f172a;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #e2e8f0;
+  text-align: center;
+  gap: 0.5rem;
+}
