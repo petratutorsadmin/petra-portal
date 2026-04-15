@@ -310,13 +310,18 @@ RETURNS boolean AS $$
   );
 $$ LANGUAGE sql SECURITY DEFINER;
 
+CREATE OR REPLACE FUNCTION public.is_student_or_parent()
+RETURNS boolean AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM public.profiles
+    WHERE id = auth.uid() AND role IN ('student', 'parent')
+  );
+$$ LANGUAGE sql SECURITY DEFINER;
+
 -- Profiles: Users can read their own profile. Admins can read all.
 CREATE POLICY "Users view own profile" ON public.profiles FOR SELECT USING (auth.uid() = id);
 CREATE POLICY "Students and parents can view tutor identity" ON public.profiles FOR SELECT USING (
-  role = 'tutor' AND 
-  EXISTS (
-    SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('student', 'parent')
-  )
+  role = 'tutor' AND public.is_student_or_parent()
 );
 CREATE POLICY "Admins view all profiles" ON public.profiles FOR SELECT USING (public.is_admin());
 CREATE POLICY "Users update own profile" ON public.profiles FOR UPDATE USING (auth.uid() = id);
