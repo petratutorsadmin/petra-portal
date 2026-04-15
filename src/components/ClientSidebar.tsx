@@ -6,8 +6,8 @@ import { createClient } from '@/utils/supabase/server'
 const PRIMARY_NAV = [
     { href: '/client/app',      label: '▶ Briefing', key: 'briefing'  },
     { href: '/client/training', label: '◈ Training', key: 'training'  },
+    { href: '/client/training/manage', label: '📚 Personal Vault', key: 'vault' },
     { href: '/client/progress', label: '◎ Progress', key: 'progress'  },
-    { href: '/client/pricing',  label: '⊞ My Plan',   key: 'plan'      },
 ]
 
 // Utility links (secondary group)
@@ -15,7 +15,6 @@ const UTILITY_NAV = [
     { href: '/client/lessons',  label: '≡ Lessons'   },
     { href: '/client/history',  label: '≡ History'   },
     { href: '/client/tutors',   label: 'My Tutors'   },
-    { href: '/client/training/manage', label: 'Personal Vault' },
     { href: '/client/payments', label: 'Payments'    },
 ]
 

@@ -40,7 +40,14 @@ export default async function CardDesignerPage({
                     <h1>{library.title}</h1>
                     <p>Card Designer — Add terms, definitions, and hints.</p>
                 </div>
-                <Link href="/client/training/manage" className="btn-secondary">← Back to Vault</Link>
+                <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+                    {cards && cards.length > 0 && (
+                        <Link href={`/client/study/match?library_id=${libraryId}`} className="btn-primary" style={{ background: '#7c3aed' }}>
+                            🎮 Play Match
+                        </Link>
+                    )}
+                    <Link href="/client/training/manage" className="btn-secondary">← Back</Link>
+                </div>
             </header>
 
             <div className="card-designer-grid mt-4">
