@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { completeStudySession, GradedCard } from './actions'
-import './study.css'
 
 interface Card {
     id: string
@@ -39,6 +38,27 @@ export default function StudyEngine({ deck, libraryTitle, libraryId, taskId }: S
     const currentCard = cards[index]
     const progress = Math.round((index / cards.length) * 100)
 
+    // Keyboard shortcuts
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (sessionState !== 'active' || isSubmitting) return
+
+            if (e.code === 'Space') {
+                e.preventDefault()
+                if (!isRevealed) setIsRevealed(true)
+            }
+
+            if (isRevealed) {
+                if (e.key === '1') grade('again')
+                if (e.key === '2') grade('hard')
+                if (e.key === '3') grade('good')
+                if (e.key === '4') grade('easy')
+            }
+        }
+        window.addEventListener('keydown', handleKeyDown)
+        return () => window.removeEventListener('keydown', handleKeyDown)
+    }, [isRevealed, sessionState, isSubmitting])
+
     const grade = async (label: 'again' | 'hard' | 'good' | 'easy') => {
         const graded: GradedCard = {
             card_id: currentCard.id,
@@ -50,7 +70,6 @@ export default function StudyEngine({ deck, libraryTitle, libraryId, taskId }: S
         setIsRevealed(false)
 
         if (index + 1 >= cards.length) {
-            // Session complete — submit
             setIsSubmitting(true)
             const durationSeconds = Math.round((Date.now() - startTimeRef.current) / 1000)
             const res = await completeStudySession({
@@ -71,79 +90,124 @@ export default function StudyEngine({ deck, libraryTitle, libraryId, taskId }: S
 
     if (cards.length === 0) {
         return (
-            <div className="study-empty">
-                <p>No cards in this deck yet.</p>
-                <p style={{ color: '#64748b', fontSize: '0.875rem' }}>Ask your tutor to add content to this library.</p>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', padding: '24px', background: 'var(--bg-workspace)' }}>
+                <div style={{ padding: '24px', border: '1px solid var(--border-main)', borderRadius: '4px', textAlign: 'center' }}>
+                    <p style={{ margin: '0 0 8px 0', fontSize: '13px', color: 'var(--text-primary)', fontWeight: 500 }}>No cards available.</p>
+                    <p style={{ margin: 0, fontSize: '12px', color: 'var(--text-secondary)' }}>Library is empty or cards are hidden.</p>
+                </div>
             </div>
         )
     }
 
     if (sessionState === 'debrief' && result) {
         return (
-            <div className="study-debrief">
-                <div className="debrief-matrix">
-                    <div className="matrix-row">
-                        <span className="matrix-label">CARDS PROCESSED</span>
-                        <span className="matrix-value">{result.cardsReviewed}</span>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', background: 'var(--bg-workspace)', padding: '24px' }}>
+                <div style={{ width: '400px', border: '1px solid var(--border-main)', borderRadius: '4px', overflow: 'hidden' }}>
+                    <div style={{ padding: '16px', borderBottom: '1px solid var(--border-main)', background: 'var(--bg-sidebar)' }}>
+                        <h2 style={{ margin: 0, fontSize: '11px', fontWeight: 600, color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Session Results</h2>
                     </div>
-                    <div className="matrix-row">
-                        <span className="matrix-label">CARDS MASTERED</span>
-                        <span className="matrix-value green">{result.cardsMastered}</span>
-                    </div>
-                    <div className="matrix-row">
-                        <span className="matrix-label">XP YIELD</span>
-                        <span className="matrix-value purple">+{result.xpEarned}</span>
+                    <div style={{ display: 'flex', borderBottom: '1px solid var(--border-main)' }}>
+                        <div style={{ flex: 1, padding: '16px', borderRight: '1px solid var(--border-main)' }}>
+                            <p style={{ margin: '0 0 4px', fontSize: '11px', color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>Reviewed</p>
+                            <p style={{ margin: 0, fontSize: '24px', fontWeight: 600, color: 'var(--text-primary)' }}>{result.cardsReviewed}</p>
+                        </div>
+                        <div style={{ flex: 1, padding: '16px', borderRight: '1px solid var(--border-main)' }}>
+                            <p style={{ margin: '0 0 4px', fontSize: '11px', color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>Mastered</p>
+                            <p style={{ margin: 0, fontSize: '24px', fontWeight: 600, color: 'var(--text-primary)' }}>{result.cardsMastered}</p>
+                        </div>
+                        <div style={{ flex: 1, padding: '16px' }}>
+                            <p style={{ margin: '0 0 4px', fontSize: '11px', color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>XP</p>
+                            <p className="pulse-xp" style={{ margin: 0, fontSize: '24px', fontWeight: 600, color: 'var(--text-primary)' }}>+{result.xpEarned}</p>
+                        </div>
                     </div>
                 </div>
-                <a href="/client/app" className="debrief-cta">← Return to Briefing</a>
+                <div style={{ marginTop: '24px' }}>
+                    <a href="/client/app" style={{ display: 'inline-block', padding: '8px 16px', border: '1px solid var(--border-main)', background: 'var(--bg-workspace)', color: 'var(--text-primary)', textDecoration: 'none', fontSize: '12px', fontWeight: 500, borderRadius: '4px' }}>
+                        Return to Briefing
+                    </a>
+                </div>
             </div>
         )
     }
 
     return (
-        <div className="study-engine">
-            {/* Progress bar (Fixed to top edge via CSS) */}
-            <div className="study-progress-track">
-                <div className="study-progress-fill" style={{ width: `${progress}%` }} />
+        <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: 'var(--bg-workspace)' }}>
+            {/* Progress Bar Top Edge */}
+            <div style={{ height: '4px', background: 'var(--border-main)', width: '100%' }}>
+                <div style={{ height: '100%', width: `${progress}%`, background: 'var(--text-primary)', transition: 'width 0.3s' }} />
             </div>
 
-            <div className="study-content-wrapper">
-                {/* Counter */}
-                <div className="study-counter">
-                    {index + 1} / {cards.length}
-                </div>
-
-                {/* Card */}
-                <div className="study-card" onClick={() => !isRevealed && setIsRevealed(true)}>
-                    <div className="card-face front">{currentCard.front_content}</div>
-
-                    {isRevealed && (
-                        <>
-                            <div className="card-divider" />
-                            <div className="card-face back">{currentCard.back_content}</div>
-                            {currentCard.hint && (
-                                <div className="card-hint">💡 {currentCard.hint}</div>
-                            )}
-                        </>
-                    )}
-
-                    {!isRevealed && (
-                        <div className="card-tap-prompt">Tap to reveal</div>
-                    )}
-                </div>
-
-                {/* Grade buttons — only visible after reveal */}
-                {isRevealed && (
-                    <div className="grade-buttons">
-                        <button className="grade-btn again" onClick={() => grade('again')} disabled={isSubmitting}>Again</button>
-                        <button className="grade-btn hard" onClick={() => grade('hard')} disabled={isSubmitting}>Hard</button>
-                        <button className="grade-btn good" onClick={() => grade('good')} disabled={isSubmitting}>Good</button>
-                        <button className="grade-btn easy" onClick={() => grade('easy')} disabled={isSubmitting}>Easy</button>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '48px 24px' }}>
+                <div style={{ width: '100%', maxWidth: '600px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
+                        <span style={{ fontSize: '11px', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{libraryTitle}</span>
+                        <span style={{ fontSize: '11px', color: 'var(--text-tertiary)', fontWeight: 600 }}>{index + 1} / {cards.length}</span>
                     </div>
-                )}
 
-                {isSubmitting && <p style={{ textAlign: 'center', color: '#94a3b8', marginTop: '1rem' }}>Saving results...</p>}
+                    {/* Card Body */}
+                    <div 
+                        onClick={() => !isRevealed && setIsRevealed(true)}
+                        style={{
+                            border: '1px solid var(--border-main)',
+                            borderRadius: '4px',
+                            background: 'var(--bg-workspace)',
+                            minHeight: '300px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            cursor: isRevealed ? 'default' : 'pointer'
+                        }}
+                    >
+                        <div style={{ flex: 1, padding: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', fontWeight: 500, color: 'var(--text-primary)', textAlign: 'center' }}>
+                            {currentCard.front_content}
+                        </div>
+
+                        {isRevealed && (
+                            <>
+                                <div style={{ height: '1px', background: 'var(--border-main)', margin: '0 24px' }} />
+                                <div style={{ flex: 1, padding: '32px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', fontSize: '16px', color: 'var(--text-secondary)', textAlign: 'center' }}>
+                                    {currentCard.back_content}
+                                    {currentCard.hint && (
+                                        <div style={{ marginTop: '16px', fontSize: '12px', color: 'var(--text-tertiary)' }}>
+                                            💡 {currentCard.hint}
+                                        </div>
+                                    )}
+                                </div>
+                            </>
+                        )}
+                        
+                        {!isRevealed && (
+                            <div style={{ padding: '16px', textAlign: 'center', fontSize: '11px', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                                &lt;Space&gt; to Reveal
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Grade Actions */}
+                    <div style={{ marginTop: '24px', height: '48px' }}>
+                        {isRevealed && (
+                            <div style={{ display: 'flex', gap: '8px' }}>
+                                <button onClick={() => grade('again')} disabled={isSubmitting} style={btnStyle}>[1] Again</button>
+                                <button onClick={() => grade('hard')} disabled={isSubmitting} style={btnStyle}>[2] Hard</button>
+                                <button onClick={() => grade('good')} disabled={isSubmitting} style={btnStyle}>[3] Good</button>
+                                <button onClick={() => grade('easy')} disabled={isSubmitting} style={btnStyle}>[4] Easy</button>
+                            </div>
+                        )}
+                    </div>
+                </div>
             </div>
         </div>
     )
+}
+
+const btnStyle = {
+    flex: 1,
+    padding: '12px',
+    background: 'transparent',
+    border: '1px solid var(--border-main)',
+    borderRadius: '4px',
+    color: 'var(--text-primary)',
+    fontSize: '12px',
+    fontWeight: 500,
+    cursor: 'pointer',
+    transition: 'background 0.1s'
 }

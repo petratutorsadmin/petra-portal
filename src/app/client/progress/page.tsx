@@ -57,7 +57,7 @@ export default async function ProgressPage() {
         })),
         links: [] as any[]
     }
-    // Simple links: cards in same library
+    
     for (let i = 0; i < masteredCards.length; i++) {
         for (let j = i + 1; j < masteredCards.length; j++) {
             if (masteredCards[i].cards?.library_id === masteredCards[j].cards?.library_id) {
@@ -68,11 +68,7 @@ export default async function ProgressPage() {
 
     const level = profile?.current_level ?? 1
     const xp = profile?.current_xp ?? 0
-    const xpPerLevel = 500
-    const xpIntoLevel = xp % xpPerLevel
-    const xpProgress = Math.round((xpIntoLevel / xpPerLevel) * 100)
-
-    // Aggregate all skill increments across reports
+    
     const skillTotals: Record<string, number> = {}
     for (const r of reports ?? []) {
         if (r.skill_increments && typeof r.skill_increments === 'object') {
@@ -90,120 +86,111 @@ export default async function ProgressPage() {
     const totalStudySessions = (sessions ?? []).length
     const totalCardsReviewed = (sessions ?? []).reduce((s: number, r: any) => s + (r.cards_reviewed ?? 0), 0)
     const totalTasksCompleted = (xpHistory ?? []).length
-    const totalXpFromTasks = (xpHistory ?? []).reduce((s: number, r: any) => s + (r.xp_reward ?? 0), 0)
 
     return (
-        <div className="progress-page">
-            <header className="progress-header">
-                <h1>Progress</h1>
-                <p>Your mastery arc — skills, XP, and study history.</p>
+        <div className="client-main-view">
+            <header className="client-header flex-between" style={{ alignItems: 'flex-end', paddingBottom: '16px', borderBottom: '1px solid var(--border-main)' }}>
+                <div>
+                    <h1>Progress</h1>
+                    <p>KPI analysis and mastery arc tracking.</p>
+                </div>
             </header>
 
-            {/* Level & XP */}
-            <section className="progress-card" style={{ marginBottom: '1.5rem' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                    <div>
-                        <p style={{ fontSize: '0.75rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 0.25rem' }}>LEVEL</p>
-                        <p style={{ fontSize: '2.5rem', fontWeight: 800, color: '#0f172a', margin: 0, lineHeight: 1 }}>{level}</p>
-                    </div>
-                    <div style={{ textAlign: 'right' }}>
-                        <p style={{ fontSize: '0.75rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 0.25rem' }}>TOTAL XP</p>
-                        <p style={{ fontSize: '1.5rem', fontWeight: 800, color: '#8b5cf6', margin: 0 }}>{xp.toLocaleString()}</p>
-                    </div>
+            {/* KPI Row - High Density Linear Style */}
+            <div style={{ display: 'flex', borderBottom: '1px solid var(--border-main)' }}>
+                <div style={{ flex: 1, padding: '16px 0', borderRight: '1px solid var(--border-main)' }}>
+                    <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Current Level</div>
+                    <div style={{ fontSize: '24px', fontWeight: 600, color: 'var(--text-primary)', marginTop: '4px' }}>{level}</div>
                 </div>
-                <div style={{ background: '#f1f5f9', borderRadius: '9999px', height: '8px', overflow: 'hidden' }}>
-                    <div style={{ width: `${xpProgress}%`, height: '100%', background: 'linear-gradient(90deg, #8b5cf6, #a78bfa)', borderRadius: '9999px', transition: 'width 0.6s ease' }} />
+                <div style={{ flex: 1, padding: '16px 16px', borderRight: '1px solid var(--border-main)' }}>
+                    <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total XP</div>
+                    <div style={{ fontSize: '24px', fontWeight: 600, color: 'var(--text-primary)', marginTop: '4px' }}>{xp.toLocaleString()}</div>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.5rem' }}>
-                    <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>{xpIntoLevel} XP</span>
-                    <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>{xpPerLevel} XP to Level {level + 1}</span>
+                <div style={{ flex: 1, padding: '16px 16px', borderRight: '1px solid var(--border-main)' }}>
+                    <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Cards Studied</div>
+                    <div style={{ fontSize: '24px', fontWeight: 600, color: 'var(--text-primary)', marginTop: '4px' }}>{totalCardsReviewed}</div>
+                </div>
+                <div style={{ flex: 1, padding: '16px 16px' }}>
+                    <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Tasks Done</div>
+                    <div style={{ fontSize: '24px', fontWeight: 600, color: 'var(--text-primary)', marginTop: '4px' }}>{totalTasksCompleted}</div>
+                </div>
+            </div>
+
+            {/* Remove big ProgressStats since we embedded them above */}
+
+            <section className="dashboard-section desktop-only" style={{ marginTop: '48px' }}>
+                <h2 style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '16px' }}>
+                    Knowledge Topology
+                </h2>
+                <div style={{ border: '1px solid var(--border-main)', background: 'var(--bg-workspace)', borderRadius: '4px', overflow: 'hidden' }}>
+                    <WordGraphWrapper data={graphData} />
                 </div>
             </section>
 
-            {/* Stats Row */}
-            <ProgressStats stats={[
-                { label: 'Lessons', value: reports?.length ?? 0 },
-                { label: 'Study Sessions', value: totalStudySessions },
-                { label: 'Cards Reviewed', value: totalCardsReviewed },
-                { label: 'Tasks Done', value: totalTasksCompleted },
-            ]} />
+            <div style={{ display: 'flex', gap: '48px', marginTop: '48px' }}>
+                {/* Left Column: Skill Mastery & Study Sessions */}
+                <div style={{ flex: 1 }}>
+                    <section className="dashboard-section" style={{ marginBottom: '32px' }}>
+                        <h2 style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px', borderBottom: '1px solid var(--border-main)', paddingBottom: '8px' }}>
+                            Skill Mastery Metrics
+                        </h2>
+                        <SkillMastery sortedSkills={sortedSkills} maxSkillVal={maxSkillVal} />
+                    </section>
 
-            {/* Knowledge Graph - Desktop Only */}
-            <section className="desktop-only" style={{ marginBottom: '1.5rem' }}>
-                <WordGraphWrapper data={graphData} />
-            </section>
-
-            {/* Skill Mastery */}
-            <SkillMastery sortedSkills={sortedSkills} maxSkillVal={maxSkillVal} />
-
-            {/* Recent Study Sessions */}
-            {(sessions ?? []).length > 0 && (
-                <section className="progress-card" style={{ marginBottom: '1.5rem' }}>
-                    <h2 className="progress-section-title">Study Sessions</h2>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
-                        {sessions!.map((s: any, i) => (
-                            <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem', background: '#f8fafc', borderRadius: '8px' }}>
-                                <div>
-                                    <p style={{ margin: 0, fontWeight: 600, fontSize: '0.875rem', color: '#0f172a' }}>
-                                        {s.card_libraries?.title ?? 'Session'}
-                                    </p>
-                                    <p style={{ margin: '0.2rem 0 0', fontSize: '0.75rem', color: '#94a3b8' }}>
-                                        {new Date(s.completed_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} · {s.cards_reviewed} cards
-                                    </p>
-                                </div>
-                                <span style={{ fontWeight: 700, fontSize: '0.875rem', color: '#8b5cf6' }}>+{s.xp_earned} XP</span>
-                            </div>
-                        ))}
-                    </div>
-                </section>
-            )}
-
-            {/* Lesson Debriefs */}
-            {(reports ?? []).length > 0 && (
-                <section className="progress-card">
-                    <h2 className="progress-section-title">Lesson History</h2>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                        {reports!.map((r: any, i) => {
-                            const lesson = r.lessons as any
-                            return (
-                                <div key={i} style={{ borderLeft: '3px solid #e2e8f0', paddingLeft: '1rem' }}>
-                                    <p style={{ margin: '0 0 0.25rem', fontSize: '0.75rem', fontWeight: 700, color: '#94a3b8' }}>
-                                        {lesson?.subject_program ?? '—'} · {lesson?.date_time ? new Date(lesson.date_time).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : ''}
-                                    </p>
-                                    {r.student_visible_comments && (
-                                        <p style={{ margin: '0 0 0.5rem', fontSize: '0.875rem', color: '#0f172a', lineHeight: 1.5, fontStyle: 'italic' }}>
-                                            "{r.student_visible_comments}"
-                                        </p>
-                                    )}
-                                    {r.skill_increments && Object.entries(r.skill_increments).filter(([_, v]) => Number(v) !== 0).length > 0 && (
-                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.375rem' }}>
-                                            {Object.entries(r.skill_increments).filter(([_, v]) => Number(v) !== 0).map(([skill, val]) => (
-                                                <span key={skill} style={{
-                                                    padding: '0.2rem 0.5rem', borderRadius: '9999px', fontSize: '0.75rem', fontWeight: 700,
-                                                    background: Number(val) > 0 ? '#d1fae5' : '#fee2e2',
-                                                    color: Number(val) > 0 ? '#065f46' : '#991b1b'
-                                                }}>
-                                                    {skill} {Number(val) > 0 ? '+' : ''}{Number(val)}
-                                                </span>
-                                            ))}
+                    {(sessions ?? []).length > 0 && (
+                        <section className="dashboard-section">
+                            <h2 style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px', borderBottom: '1px solid var(--border-main)', paddingBottom: '8px' }}>
+                                Session Log
+                            </h2>
+                            <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                {sessions!.map((s: any, i) => (
+                                    <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 0', borderBottom: '1px solid var(--border-main)' }}>
+                                        <span style={{ fontSize: '13px', color: 'var(--text-primary)', fontWeight: 500 }}>
+                                            {s.card_libraries?.title ?? 'Session'}
+                                        </span>
+                                        <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+                                            <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{new Date(s.completed_at).toLocaleDateString()}</span>
+                                            <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-primary)' }}>+{s.xp_earned} XP</span>
                                         </div>
-                                    )}
-                                </div>
-                            )
-                        })}
-                    </div>
-                </section>
-            )}
-
-            {(reports ?? []).length === 0 && (sessions ?? []).length === 0 && (
-                <div style={{ textAlign: 'center', padding: '4rem 2rem', color: '#94a3b8' }}>
-                    <p style={{ fontWeight: 600, margin: '0 0 0.5rem' }}>No progress data yet.</p>
-                    <p style={{ fontSize: '0.875rem', margin: 0 }}>Complete lessons and study sessions to see your mastery arc here.</p>
-                    <Link href="/client/training" style={{ display: 'inline-block', marginTop: '1.5rem', padding: '0.75rem 1.5rem', background: '#0f172a', color: '#fff', borderRadius: '10px', fontWeight: 700, fontSize: '0.875rem', textDecoration: 'none' }}>
-                        Start Training →
-                    </Link>
+                                    </div>
+                                ))}
+                            </div>
+                        </section>
+                    )}
                 </div>
-            )}
+
+                {/* Right Column: Lesson Debriefs */}
+                <div style={{ flex: 1 }}>
+                    {(reports ?? []).length > 0 && (
+                        <section className="dashboard-section">
+                            <h2 style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px', borderBottom: '1px solid var(--border-main)', paddingBottom: '8px' }}>
+                                Tutor Debriefs
+                            </h2>
+                            <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                {reports!.map((r: any, i) => {
+                                    const lesson = r.lessons as any
+                                    return (
+                                        <div key={i} style={{ padding: '16px 0', borderBottom: '1px solid var(--border-main)' }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                                                <span style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: 500 }}>{lesson?.subject_program ?? '—'}</span>
+                                                <span style={{ fontSize: '12px', color: 'var(--text-tertiary)' }}>
+                                                    {lesson?.date_time ? new Date(lesson.date_time).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : ''}
+                                                </span>
+                                            </div>
+                                            {r.student_visible_comments && (
+                                                <p style={{ margin: '0 0 12px 0', fontSize: '13px', color: 'var(--text-primary)', lineHeight: 1.5 }}>
+                                                    "{r.student_visible_comments}"
+                                                </p>
+                                            )}
+                                        </div>
+                                    )
+                                })}
+                            </div>
+                        </section>
+                    )}
+                </div>
+            </div>
+
         </div>
     )
 }

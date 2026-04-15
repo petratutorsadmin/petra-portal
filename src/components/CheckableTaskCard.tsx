@@ -23,64 +23,67 @@ export default function CheckableTaskCard({ task, onComplete }: { task: any, onC
             display: 'flex', 
             justifyContent: 'space-between', 
             alignItems: 'center', 
-            background: '#ffffff', 
-            padding: '1rem', 
-            borderRadius: '12px', 
-            border: isStudyTask ? '1px solid #ddd6fe' : '1px solid #e2e8f0',
-            boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
+            padding: '12px 0', 
+            borderBottom: '1px solid var(--border-main)',
             opacity: isCompleting ? 0 : 1,
-            transform: isCompleting ? 'scale(0.98)' : 'scale(1)',
-            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-            gap: '1rem'
+            transition: 'opacity 0.2s',
         }}>
-            <div style={{ flex: 1, minWidth: 0 }}>
-                <h4 style={{ margin: 0, fontSize: '1rem', color: '#0f172a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <span style={{ 
+                    fontSize: '11px', fontWeight: 600, 
+                    color: isStudyTask ? 'var(--text-primary)' : 'var(--text-secondary)',
+                    border: '1px solid var(--border-main)',
+                    background: isStudyTask ? 'var(--bg-hover)' : 'transparent',
+                    padding: '2px 6px', borderRadius: '4px', 
+                    textTransform: 'uppercase', letterSpacing: '0.05em'
+                }}>
+                    {isStudyTask ? 'Training' : 'Task'}
+                </span>
+                <h4 style={{ margin: 0, fontSize: '13px', color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', fontWeight: 500 }}>
                     {task.title}
                 </h4>
-                <span style={{ 
-                    fontSize: '0.75rem', fontWeight: 600, 
-                    color: isStudyTask ? '#7c3aed' : '#8b5cf6', 
-                    background: isStudyTask ? '#f5f3ff' : '#ede9fe', 
-                    padding: '0.25rem 0.5rem', borderRadius: '9999px', 
-                    display: 'inline-block', marginTop: '0.5rem' 
-                }}>
-                    {isStudyTask ? '▶ Training' : `+${task.xp_reward} XP`}
-                </span>
             </div>
 
-            {isStudyTask ? (
-                <Link
-                    href={`/client/study?task_id=${task.id}`}
-                    style={{
-                        flexShrink: 0,
-                        padding: '0.5rem 1rem',
-                        background: '#7c3aed',
-                        color: '#fff',
-                        borderRadius: '8px',
-                        fontWeight: 700,
-                        fontSize: '0.875rem',
-                        textDecoration: 'none',
-                        whiteSpace: 'nowrap',
-                    }}
-                >
-                    Start →
-                </Link>
-            ) : (
-                <button 
-                    onClick={handleCheck}
-                    disabled={isCompleting}
-                    style={{ 
-                        flexShrink: 0,
-                        width: '32px', height: '32px', borderRadius: '50%', 
-                        border: '2px solid #cbd5e1', background: 'transparent',
-                        cursor: 'pointer', display: 'flex',
-                        alignItems: 'center', justifyContent: 'center'
-                    }}
-                >
-                    {isCompleting && <span style={{ width: '12px', height: '12px', background: '#8b5cf6', borderRadius: '50%' }}></span>}
-                </button>
-            )}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                {!isStudyTask && (
+                    <span style={{ fontSize: '12px', fontWeight: 500, color: 'var(--text-tertiary)' }}>
+                        +{task.xp_reward} XP
+                    </span>
+                )}
+
+                {isStudyTask ? (
+                    <Link
+                        href={`/client/study?task_id=${task.id}`}
+                        style={{
+                            padding: '4px 12px',
+                            background: 'var(--text-primary)',
+                            color: 'var(--bg-workspace)',
+                            borderRadius: '4px',
+                            fontWeight: 500,
+                            fontSize: '12px',
+                            textDecoration: 'none',
+                        }}
+                    >
+                        Start
+                    </Link>
+                ) : (
+                    <button 
+                        onClick={handleCheck}
+                        disabled={isCompleting}
+                        style={{ 
+                            width: '20px', height: '20px', borderRadius: '4px', 
+                            border: '1px solid var(--border-main)', background: 'transparent',
+                            cursor: 'pointer', display: 'flex',
+                            alignItems: 'center', justifyContent: 'center',
+                            transition: 'background 0.1s, border-color 0.1s'
+                        }}
+                        onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--text-primary)' }}
+                        onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--border-main)' }}
+                    >
+                        {isCompleting && <span style={{ width: '10px', height: '10px', background: 'var(--text-primary)', borderRadius: '2px' }}></span>}
+                    </button>
+                )}
+            </div>
         </div>
     )
 }
-

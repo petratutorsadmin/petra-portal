@@ -2,20 +2,20 @@ import Link from 'next/link'
 import { logout } from '@/app/actions/auth'
 import { createClient } from '@/utils/supabase/server'
 
-// Primary OS modes (top group)
-const PRIMARY_NAV = [
-    { href: '/client/app',      label: '▶ Briefing', key: 'briefing'  },
-    { href: '/client/training', label: '◈ Training', key: 'training'  },
-    { href: '/client/training/manage', label: '📚 Personal Vault', key: 'vault' },
-    { href: '/client/progress', label: '◎ Progress', key: 'progress'  },
+const DB_NAV = [
+    { href: '/client/app',      label: 'Briefing', key: 'briefing'  },
+    { href: '/client/progress', label: 'Progress', key: 'progress'  },
 ]
 
-// Utility links (secondary group)
+const STUDY_NAV = [
+    { href: '/client/training/manage', label: 'Personal Vault', key: 'vault' },
+    { href: '/client/training', label: 'Training', key: 'training'  },
+]
+
 const UTILITY_NAV = [
-    { href: '/client/lessons',  label: '≡ Lessons'   },
-    { href: '/client/history',  label: '≡ History'   },
-    { href: '/client/tutors',   label: 'My Tutors'   },
-    { href: '/client/payments', label: 'Payments'    },
+    { href: '/client/lessons',  label: 'Lessons'   },
+    { href: '/client/tutors',   label: 'Tutors'   },
+    { href: '/client/payments', label: 'Settings'    },
 ]
 
 export default async function ClientSidebar() {
@@ -38,43 +38,73 @@ export default async function ClientSidebar() {
                 <h2>Petra OS</h2>
             </div>
             <nav className="client-nav">
-                <ul>
-                    {PRIMARY_NAV.map(item => (
-                        <li key={item.href}>
-                            <Link href={item.href} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                <span>{item.label}</span>
-                                {item.key === 'briefing' && streak > 0 && (
-                                    <span style={{ 
-                                        color: '#f97316', 
-                                        fontSize: '0.75rem', 
-                                        fontWeight: 800, 
-                                        background: 'rgba(249, 115, 22, 0.1)',
-                                        padding: '0.1rem 0.4rem',
-                                        borderRadius: '4px',
-                                        marginRight: '0.5rem'
-                                    }}>
-                                        🔥 {streak}
-                                    </span>
-                                )}
-                            </Link>
-                        </li>
-                    ))}
-                </ul>
+                
+                <div className="nav-group">
+                    <div className="nav-group-label">Core</div>
+                    <ul>
+                        {DB_NAV.map(item => (
+                            <li key={item.href}>
+                                <Link prefetch={false} href={item.href} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                    <span>{item.label}</span>
+                                    {item.key === 'briefing' && streak > 0 && (
+                                        <span style={{ 
+                                            color: 'var(--accent-orange)', 
+                                            fontSize: '11px', 
+                                            fontWeight: 600, 
+                                            background: 'transparent',
+                                            border: '1px solid currentColor',
+                                            padding: '1px 4px',
+                                            borderRadius: '4px',
+                                        }}>
+                                            {streak} Day
+                                        </span>
+                                    )}
+                                </Link>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
 
-                {/* Divider */}
-                <div style={{ height: '1px', background: 'rgba(255,255,255,0.07)', margin: '0.75rem 1rem' }} />
+                <div className="nav-group">
+                    <div className="nav-group-label">Database</div>
+                    <ul>
+                        {STUDY_NAV.map(item => (
+                            <li key={item.href}>
+                                <Link prefetch={false} href={item.href}>{item.label}</Link>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
 
-                <ul>
-                    {UTILITY_NAV.map(item => (
-                        <li key={item.href}>
-                            <Link href={item.href} style={{ fontSize: '0.8rem' }}>{item.label}</Link>
-                        </li>
-                    ))}
-                </ul>
+                <div className="nav-group">
+                    <div className="nav-group-label">Tools</div>
+                    <ul>
+                        {UTILITY_NAV.map(item => (
+                            <li key={item.href}>
+                                <Link prefetch={false} href={item.href}>{item.label}</Link>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+
             </nav>
-            <div className="sidebar-footer">
+            <div style={{ padding: '16px', borderTop: '1px solid var(--border-main)', marginTop: 'auto' }}>
                 <form action={logout}>
-                    <button type="submit" className="logout-btn">Sign Out</button>
+                    <button type="submit" className="sidebar-logout-btn" style={{
+                        width: '100%',
+                        padding: '6px 12px',
+                        background: 'transparent',
+                        color: 'var(--text-secondary)',
+                        border: '1px solid transparent',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        fontSize: '12px',
+                        textAlign: 'left',
+                        fontWeight: 500,
+                        transition: 'background 0.1s, color 0.1s'
+                    }}>
+                        Sign out
+                    </button>
                 </form>
             </div>
         </aside>

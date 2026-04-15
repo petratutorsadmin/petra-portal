@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { submitMatchScore } from './actions'
-import './match.css'
 
 interface Card {
     id: string
@@ -50,7 +49,6 @@ export default function MatchEngine({ deck, libraryTitle, libraryId }: MatchEngi
     useEffect(() => {
         if (!deck || deck.length === 0) return
 
-        // Pick up to 6 random cards for a smooth mobile experience
         const shuffledDeck = shuffleArray(deck)
         const selectedCards = shuffledDeck.slice(0, 6)
 
@@ -81,14 +79,12 @@ export default function MatchEngine({ deck, libraryTitle, libraryId }: MatchEngi
     const handleTileClick = async (tile: Tile) => {
         if (tile.state === 'matched' || tile.state === 'error' || isGameOver) return
         
-        // Deselect if clicking the same selected tile
         if (selectedId === tile.uniqueId) {
             setSelectedId(null)
             setTiles(ts => ts.map(t => t.uniqueId === tile.uniqueId ? { ...t, state: 'idle' } : t))
             return
         }
 
-        // No tile selected yet
         if (!selectedId) {
             setSelectedId(tile.uniqueId)
             setTiles(ts => ts.map(t => t.uniqueId === tile.uniqueId ? { ...t, state: 'selected' } : t))
@@ -98,11 +94,9 @@ export default function MatchEngine({ deck, libraryTitle, libraryId }: MatchEngi
         const selectedTile = tiles.find(t => t.uniqueId === selectedId)
         if (!selectedTile) return
 
-        // Check Match
         const isMatch = selectedTile.cardId === tile.cardId && selectedTile.type !== tile.type
 
         if (isMatch) {
-            // Match success
             setTiles(ts => ts.map(t => 
                 t.uniqueId === tile.uniqueId || t.uniqueId === selectedTile.uniqueId 
                     ? { ...t, state: 'matched' } 
@@ -113,7 +107,6 @@ export default function MatchEngine({ deck, libraryTitle, libraryId }: MatchEngi
             const newMatchesFound = matchesFound + 1
             setMatchesFound(newMatchesFound)
 
-            // Game over logic
             if (newMatchesFound === totalPairs) {
                 setIsGameOver(true)
                 const timeSec = Math.round((Date.now() - (startTimeRef.current || Date.now())) / 1000)
@@ -125,7 +118,6 @@ export default function MatchEngine({ deck, libraryTitle, libraryId }: MatchEngi
                 setResult({ xpEarned: res.xpEarned || 0, timeSec })
             }
         } else {
-            // Match failed
             setTiles(ts => ts.map(t => 
                 t.uniqueId === tile.uniqueId || t.uniqueId === selectedTile.uniqueId 
                     ? { ...t, state: 'error' } 
@@ -143,59 +135,108 @@ export default function MatchEngine({ deck, libraryTitle, libraryId }: MatchEngi
 
     if (deck.length === 0) {
         return (
-            <div className="match-engine error">
-                <p>No cards available to play Match.</p>
-                <a href="/client/app" className="btn-primary mt-4">Return Home</a>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', background: 'var(--bg-workspace)' }}>
+                <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>No cards available.</p>
             </div>
         )
     }
 
     if (isGameOver && result) {
         return (
-            <div className="match-engine debrief">
-                <h2>Match Complete!</h2>
-                <div className="debrief-matrix mt-4">
-                    <div className="matrix-row">
-                        <span className="matrix-label">TIME</span>
-                        <span className="matrix-value">{result.timeSec}s</span>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', background: 'var(--bg-workspace)', padding: '24px' }}>
+                <div style={{ width: '400px', border: '1px solid var(--border-main)', borderRadius: '4px', overflow: 'hidden' }}>
+                    <div style={{ padding: '16px', borderBottom: '1px solid var(--border-main)', background: 'var(--bg-sidebar)' }}>
+                        <h2 style={{ margin: 0, fontSize: '11px', fontWeight: 600, color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Match Complete</h2>
                     </div>
-                    <div className="matrix-row">
-                        <span className="matrix-label">PAIRS</span>
-                        <span className="matrix-value">{totalPairs}</span>
-                    </div>
-                    <div className="matrix-row">
-                        <span className="matrix-label">XP EARNED</span>
-                        <span className="matrix-value purple">+{result.xpEarned}</span>
+                    <div style={{ display: 'flex', borderBottom: '1px solid var(--border-main)' }}>
+                        <div style={{ flex: 1, padding: '16px', borderRight: '1px solid var(--border-main)' }}>
+                            <p style={{ margin: '0 0 4px', fontSize: '11px', color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>Time</p>
+                            <p style={{ margin: 0, fontSize: '24px', fontWeight: 600, color: 'var(--text-primary)' }}>{result.timeSec}s</p>
+                        </div>
+                        <div style={{ flex: 1, padding: '16px', borderRight: '1px solid var(--border-main)' }}>
+                            <p style={{ margin: '0 0 4px', fontSize: '11px', color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>Pairs</p>
+                            <p style={{ margin: 0, fontSize: '24px', fontWeight: 600, color: 'var(--text-primary)' }}>{totalPairs}</p>
+                        </div>
+                        <div style={{ flex: 1, padding: '16px' }}>
+                            <p style={{ margin: '0 0 4px', fontSize: '11px', color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>XP</p>
+                            <p className="pulse-xp" style={{ margin: 0, fontSize: '24px', fontWeight: 600, color: 'var(--text-primary)' }}>+{result.xpEarned}</p>
+                        </div>
                     </div>
                 </div>
-                <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
-                    <button onClick={() => window.location.reload()} className="btn-secondary">Play Again</button>
-                    <a href="/client/training" className="btn-primary">Exit</a>
+                <div style={{ display: 'flex', gap: '16px', marginTop: '24px' }}>
+                    <button onClick={() => window.location.reload()} style={{ padding: '8px 16px', background: 'transparent', border: '1px solid var(--border-main)', borderRadius: '4px', color: 'var(--text-primary)', cursor: 'pointer', fontSize: '12px' }}>
+                        Play Again
+                    </button>
+                    <a href="/client/training" style={{ padding: '8px 16px', background: 'var(--text-primary)', border: '1px solid var(--text-primary)', borderRadius: '4px', color: 'var(--bg-workspace)', cursor: 'pointer', fontSize: '12px', textDecoration: 'none' }}>
+                        Exit
+                    </a>
                 </div>
             </div>
         )
     }
 
     return (
-        <div className="match-engine active">
-            <header className="match-header">
-                <h2>{libraryTitle} (Match)</h2>
-                <div className="match-progress">
-                    {matchesFound} / {totalPairs} matched
-                </div>
-            </header>
+        <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: 'var(--bg-workspace)' }}>
+            <div style={{ height: '4px', background: 'var(--border-main)', width: '100%' }}>
+                <div style={{ height: '100%', width: `${(matchesFound / totalPairs) * 100}%`, background: 'var(--text-primary)', transition: 'width 0.3s' }} />
+            </div>
 
-            <div className="match-grid">
-                {tiles.map((tile) => (
-                    <button
-                        key={tile.uniqueId}
-                        className={`match-tile state-${tile.state}`}
-                        onClick={() => handleTileClick(tile)}
-                        disabled={tile.state === 'matched' || isSubmitting}
-                    >
-                        {tile.text}
-                    </button>
-                ))}
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '48px 24px' }}>
+                <div style={{ width: '100%', maxWidth: '800px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '24px' }}>
+                        <span style={{ fontSize: '11px', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{libraryTitle}</span>
+                        <span style={{ fontSize: '11px', color: 'var(--text-tertiary)', fontWeight: 600 }}>{matchesFound} / {totalPairs} matched</span>
+                    </div>
+
+                    <div style={{ 
+                        display: 'grid', 
+                        gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', 
+                        gap: '12px' 
+                    }}>
+                        {tiles.map((tile) => {
+                            let border = '1px solid var(--border-main)'
+                            let bg = 'var(--bg-workspace)'
+                            let opacity = 1
+                            let color = 'var(--text-primary)'
+
+                            if (tile.state === 'selected') {
+                                border = '1px solid var(--text-primary)'
+                                bg = 'var(--bg-active)'
+                            } else if (tile.state === 'error') {
+                                border = '1px solid red'
+                                bg = '#fee2e2'
+                            } else if (tile.state === 'matched') {
+                                border = '1px solid var(--border-main)'
+                                opacity = 0
+                            }
+
+                            return (
+                                <button
+                                    key={tile.uniqueId}
+                                    onClick={() => handleTileClick(tile)}
+                                    disabled={tile.state === 'matched' || isSubmitting}
+                                    style={{
+                                        minHeight: '160px', /* Larger mobile tap target */
+                                        touchAction: 'manipulation', /* Prevent double tap zoom */
+                                        padding: '16px',
+                                        background: bg,
+                                        border: border,
+                                        borderRadius: '4px',
+                                        color: color,
+                                        fontSize: '16px',
+                                        fontWeight: 600,
+                                        cursor: tile.state === 'matched' ? 'default' : 'pointer',
+                                        opacity: opacity,
+                                        transition: 'all 0.2s',
+                                        pointerEvents: tile.state === 'matched' ? 'none' : 'auto'
+                                    }}
+                                >
+                                    {tile.text}
+                                </button>
+                            )
+                        })}
+                    </div>
+                </div>
             </div>
         </div>
     )

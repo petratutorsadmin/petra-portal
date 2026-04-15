@@ -1,7 +1,6 @@
 import { createClient } from '@/utils/supabase/server'
 import Link from 'next/link'
 import { createPersonalLibrary, deletePersonalLibrary } from './actions'
-import './vault.css'
 
 export default async function PersonalVaultPage() {
     const supabase = await createClient()
@@ -17,51 +16,77 @@ export default async function PersonalVaultPage() {
         .order('created_at', { ascending: false })
 
     return (
-        <div className="vault-page">
-            <header className="client-header flex-between">
+        <div className="client-main-view">
+            <header className="client-header flex-between" style={{ alignItems: 'flex-end', paddingBottom: '16px', borderBottom: '1px solid var(--border-main)' }}>
                 <div>
-                    <h1>The Personal Vault</h1>
+                    <h1>Personal Vault</h1>
                     <p>Create and manage your custom study collections.</p>
                 </div>
             </header>
 
-            <div className="vault-grid mt-4">
-                {/* Create New Card */}
-                <section className="vault-card new-set">
-                    <h3>New Collection</h3>
-                    <form action={createPersonalLibrary} className="vault-form">
-                        <div className="form-group">
-                            <input type="text" name="title" placeholder="Collection Title (e.g. Biology Exam)" required />
-                        </div>
-                        <div className="form-group">
-                            <input type="text" name="subject" placeholder="Subject (Optional)" />
-                        </div>
-                        <button type="submit" className="btn-primary w-full">+ Create Library</button>
-                    </form>
-                </section>
+            <div style={{ marginTop: '32px' }}>
+                <h2 style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px', borderBottom: '1px solid var(--border-main)', paddingBottom: '8px' }}>
+                    New Collection
+                </h2>
+                <form action={createPersonalLibrary} style={{ display: 'flex', gap: '16px', alignItems: 'center', padding: '16px 0', borderBottom: '1px solid var(--border-main)' }}>
+                    <input 
+                        type="text" 
+                        name="title" 
+                        placeholder="Collection Title" 
+                        required 
+                        style={{ flex: 2, background: 'transparent', border: 'none', borderBottom: '1px solid var(--border-main)', padding: '8px 0', fontSize: '13px', color: 'var(--text-primary)', outline: 'none' }}
+                    />
+                    <input 
+                        type="text" 
+                        name="subject" 
+                        placeholder="Subject (Optional)" 
+                        style={{ flex: 1, background: 'transparent', border: 'none', borderBottom: '1px solid var(--border-main)', padding: '8px 0', fontSize: '13px', color: 'var(--text-primary)', outline: 'none' }}
+                    />
+                    <button type="submit" style={{ padding: '8px 16px', background: 'var(--text-primary)', color: 'var(--bg-workspace)', border: 'none', borderRadius: '4px', fontSize: '12px', fontWeight: 500, cursor: 'pointer' }}>
+                        Create
+                    </button>
+                </form>
+            </div>
+
+            <div style={{ marginTop: '48px' }}>
+                <h2 style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px', borderBottom: '1px solid var(--border-main)', paddingBottom: '8px' }}>
+                    Database
+                </h2>
+
+                {/* Table Header */}
+                <div style={{ display: 'flex', padding: '8px 0', borderBottom: '1px solid var(--border-main)', fontSize: '11px', color: 'var(--text-tertiary)' }}>
+                    <div style={{ flex: 2 }}>TITLE</div>
+                    <div style={{ flex: 1 }}>SUBJECT</div>
+                    <div style={{ width: '80px', textAlign: 'right' }}>CARDS</div>
+                    <div style={{ width: '120px', textAlign: 'right' }}>ACTIONS</div>
+                </div>
 
                 {libraries?.map((lib: any) => (
-                    <div key={lib.id} className="vault-card collection-item">
-                        <div className="collection-info">
-                            <div className="collection-subject">{lib.subject || 'Personal Set'}</div>
-                            <h3 className="collection-title">{lib.title}</h3>
-                            <p className="collection-meta">{(lib.cards as any)?.[0]?.count || 0} cards</p>
+                    <div key={lib.id} style={{ display: 'flex', alignItems: 'center', padding: '12px 0', borderBottom: '1px solid var(--border-main)', fontSize: '13px' }}>
+                        <div style={{ flex: 2, fontWeight: 500, color: 'var(--text-primary)' }}>
+                            <Link href={`/client/training/manage/${lib.id}`} style={{ textDecoration: 'none', color: 'var(--text-primary)' }}>
+                                {lib.title}
+                            </Link>
                         </div>
-                        <div className="collection-actions">
-                            <Link href={`/client/training/manage/${lib.id}`} className="btn-secondary">Manage Cards</Link>
+                        <div style={{ flex: 1, color: 'var(--text-secondary)' }}>{lib.subject || '—'}</div>
+                        <div style={{ width: '80px', textAlign: 'right', color: 'var(--text-secondary)' }}>{(lib.cards as any)?.[0]?.count || 0}</div>
+                        <div style={{ width: '120px', textAlign: 'right', display: 'flex', justifyContent: 'flex-end', gap: '16px' }}>
                             <form action={deletePersonalLibrary.bind(null, lib.id)}>
-                                <button type="submit" className="btn-icon delete" title="Delete Collection">🗑</button>
+                                <button type="submit" style={{ background: 'transparent', border: 'none', color: 'var(--text-tertiary)', cursor: 'pointer', fontSize: '12px', padding: 0 }} title="Delete">
+                                    Delete
+                                </button>
                             </form>
                         </div>
                     </div>
                 ))}
+
+                {!libraries?.length && (
+                    <div style={{ padding: '24px 0', borderBottom: '1px solid var(--border-main)', display: 'flex', justifyContent: 'space-between' }}>
+                        <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>No collections found.</span>
+                        <span style={{ fontSize: '13px', color: 'var(--text-tertiary)' }}>Empty</span>
+                    </div>
+                )}
             </div>
-            
-            {!libraries?.length && (
-                <div className="empty-state mt-4">
-                    <p>You haven&apos;t created any personal study sets yet.</p>
-                </div>
-            )}
         </div>
     )
 }
