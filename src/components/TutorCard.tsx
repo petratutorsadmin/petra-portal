@@ -1,4 +1,5 @@
 import React from 'react'
+import MatchRequestForm from './MatchRequestForm'
 
 interface TutorCardProps {
     tutor: {
@@ -11,7 +12,7 @@ interface TutorCardProps {
             last_name: string
         } | null
     }
-    onRequestMatch: (tutorId: string, name: string, expertise: string) => void
+    onRequestMatch: (tutorId: string, name: string, expertise: string) => Promise<{ success: boolean, message: string }>
 }
 
 export default function TutorCard({ tutor, onRequestMatch }: TutorCardProps) {
@@ -40,9 +41,12 @@ export default function TutorCard({ tutor, onRequestMatch }: TutorCardProps) {
             <p style={{ fontSize: '0.95rem', color: '#4b5563', lineHeight: 1.5, flex: 1 }}>{tutor.bio}</p>
 
             <div style={{ marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid #f3f4f6' }}>
-                <form action={onRequestMatch.bind(null, tutor.id, name, expertise)}>
-                    <button type="submit" className="btn-primary" style={{ width: '100%' }}>Request Match (Test Calendar Sync)</button>
-                </form>
+                <MatchRequestForm 
+                    tutorId={tutor.id} 
+                    tutorName={name} 
+                    expertise={expertise} 
+                    onRequestMatch={onRequestMatch} 
+                />
             </div>
         </div>
     )

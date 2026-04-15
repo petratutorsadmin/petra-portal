@@ -46,6 +46,7 @@ export async function requestMatch(tutorId: string, tutorName: string, subjectPr
     const trialDate = new Date()
     trialDate.setDate(trialDate.getDate() + 7)
 
+    let calendarLink = null
     try {
         const calendarRes = await createCalendarEvent({
             title: `Trial Lesson: ${subjectProgram}`,
@@ -54,14 +55,25 @@ export async function requestMatch(tutorId: string, tutorName: string, subjectPr
             durationMinutes: 60,
             tutorName: tutorName,
             studentName: studentName,
-            userId: user.id // Pass the user ID for OAuth lookup
+            userId: user.id
         })
-
-        console.log('Calendar sync attempt:', calendarRes)
+        
+        if (calendarRes.success) {
+            calendarLink = calendarRes.link
+        } else {
+            console.error('Calendar Sync Error:', calendarRes.error)
+        }
     } catch (err) {
         console.error('Ignoring Calendar Sync error on Request Match:', err)
     }
 
     revalidatePath('/client/browse')
     revalidatePath('/client')
+
+    return { 
+        success: true, 
+        message: calendarLink 
+            ? `Match requested and synced to calendar! Check your Google Calendar.` 
+            : `Match requested! (Admin will review. Note: Google Calendar sync skipped due to missing credentials)`
+    }
 }
