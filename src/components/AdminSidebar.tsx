@@ -19,6 +19,7 @@ export default function AdminSidebar() {
                         </ul>
                     </li>
                     <li><Link href="/admin/invoices">Invoices &amp; Payouts</Link></li>
+                    <li><Link href="/admin/plan-requests">Plan Requests</Link></li>
                 </ul>
             </nav>
             <div className="sidebar-footer">
