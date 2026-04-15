@@ -329,6 +329,7 @@ CREATE POLICY "Tutors update own tutor profile" ON public.tutor_profiles FOR UPD
 
 -- Student Profiles: Students see own. Parents see linked. Admins see all. Tutors see matched.
 CREATE POLICY "Students view own student profile" ON public.student_profiles FOR SELECT USING (auth.uid() = id);
+CREATE POLICY "Students update own student profile" ON public.student_profiles FOR UPDATE USING (auth.uid() = id) WITH CHECK (auth.uid() = id);
 CREATE POLICY "Admins view all student profiles" ON public.student_profiles FOR SELECT USING (public.is_admin());
 CREATE POLICY "Parents view linked student profiles" ON public.student_profiles FOR SELECT USING (
   EXISTS (
@@ -336,6 +337,15 @@ CREATE POLICY "Parents view linked student profiles" ON public.student_profiles 
   )
 );
 CREATE POLICY "Tutors view matched student profiles" ON public.student_profiles FOR SELECT USING (
+  EXISTS (
+    SELECT 1 FROM public.matches WHERE tutor_id = auth.uid() AND student_id = public.student_profiles.id
+  )
+);
+CREATE POLICY "Tutors update matched student profiles" ON public.student_profiles FOR UPDATE USING (
+  EXISTS (
+    SELECT 1 FROM public.matches WHERE tutor_id = auth.uid() AND student_id = public.student_profiles.id
+  )
+) WITH CHECK (
   EXISTS (
     SELECT 1 FROM public.matches WHERE tutor_id = auth.uid() AND student_id = public.student_profiles.id
   )
