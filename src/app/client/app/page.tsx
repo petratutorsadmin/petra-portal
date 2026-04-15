@@ -2,7 +2,6 @@ import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import CheckableTaskCard from '@/components/CheckableTaskCard'
 import BriefingHeader from '@/components/BriefingHeader'
-import DebriefCard from '@/components/DebriefCard'
 import { completeTask } from './actions'
 import './student-app.css'
 
@@ -61,9 +60,26 @@ export default async function StudentCompanionHub() {
                 currentLevel={profile?.current_level || 1}
             />
 
+            {/* TASKS GO FIRST AS THE CORE ENGINE */}
+            <section style={{ marginBottom: '2rem' }}>
+                <h2 className="section-title">Up Next</h2>
+                {tasks && tasks.length > 0 ? (
+                    <div className="task-list">
+                        {tasks.map((task: any) => (
+                            <CheckableTaskCard key={task.id} task={task} onComplete={completeTask} />
+                        ))}
+                    </div>
+                ) : (
+                    <div className="empty-state" style={{ background: '#f8fafc', padding: '1.25rem', borderRadius: '12px', color: '#64748b', fontSize: '0.9rem', textAlign: 'center', border: '1px solid #e2e8f0' }}>
+                        <p style={{ margin: 0 }}>No pending tasks. You're all caught up!</p>
+                    </div>
+                )}
+            </section>
+
+            {/* NEXT SESSION MOVES DOWN (SECONDARY TO TASKS) */}
             {nextLesson && (
                 <section className="lesson-anchor">
-                    <p className="section-label">NEXT SESSION</p>
+                    <p className="section-label">UPCOMING LESSON</p>
                     <p className="lesson-title">
                         {new Date(nextLesson.date_time).toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })} at {new Date(nextLesson.date_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </p>
@@ -72,24 +88,8 @@ export default async function StudentCompanionHub() {
                     </p>
                 </section>
             )}
-
-            <section style={{ marginBottom: '3rem' }}>
-                <h2 className="section-title">Current Objectives</h2>
-                {tasks && tasks.length > 0 ? (
-                    <div className="task-list">
-                        {tasks.map((task: any) => (
-                            <CheckableTaskCard key={task.id} task={task} onComplete={completeTask} />
-                        ))}
-                    </div>
-                ) : (
-                    <div className="empty-state">
-                        <p>No pending objectives. You&apos;re all caught up!</p>
-                    </div>
-                )}
-            </section>
-
-            {lastReport && <DebriefCard report={lastReport as any} />}
         </div>
     )
+
 }
 
