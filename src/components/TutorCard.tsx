@@ -40,7 +40,7 @@ export default function TutorCard({ tutor, onRequestMatch }: TutorCardProps) {
             <p style={{ fontSize: '0.95rem', color: '#4b5563', lineHeight: 1.5, flex: 1 }}>{tutor.bio}</p>
 
             <div style={{ marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid #f3f4f6' }}>
-                <form action={() => onRequestMatch(tutor.id, name, expertise)}>
+                <form action={onRequestMatch.bind(null, tutor.id, name, expertise)}>
                     <button type="submit" className="btn-primary" style={{ width: '100%' }}>Request Match (Test Calendar Sync)</button>
                 </form>
             </div>
