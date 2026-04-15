@@ -86,3 +86,61 @@ export async function deletePersonalLibrary(libraryId: string) {
 
     revalidatePath('/client/training/manage')
 }
+
+export async function quickAddCard({ front, back, hint }: { front: string, back: string, hint?: string }) {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { success: false, error: 'Unauthorized' }
+
+    // Find or create 'Quick Captures' library
+    let { data: library } = await supabase
+        .from('card_libraries')
+        .select('id')
+        .eq('created_by', user.id)
+        .eq('title', 'Quick Captures')
+        .single()
+
+    if (!library) {
+        const { data: newLib, error: createErr } = await supabase
+            .from('card_libraries')
+            .insert({
+                title: 'Quick Captures',
+                subject: 'Uncategorized',
+                created_by: user.id
+            })
+            .select('id')
+            .single()
+            
+        if (createErr) return { success: false, error: 'Failed to create system library' }
+        library = newLib
+    }
+
+    if (!library) return { success: false, error: 'Failed to find library' }
+
+    // Insert card
+    const { data: card, error: cardError } = await supabase
+        .from('cards')
+        .insert({
+            library_id: library.id,
+            front_content: front,
+            back_content: back,
+            hint: hint || null
+        })
+        .select('id')
+        .single()
+
+    if (cardError) return { success: false, error: 'Failed to insert card' }
+
+    // Initialize SREP
+    if (card) {
+        await supabase
+            .from('student_card_performance')
+            .insert({
+                student_id: user.id,
+                card_id: card.id
+            })
+    }
+
+    revalidatePath('/client')
+    return { success: true }
+}

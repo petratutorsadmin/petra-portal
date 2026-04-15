@@ -3,6 +3,7 @@ import { createClient } from '@/utils/supabase/server'
 import ClientSidebar from '@/components/ClientSidebar'
 import ContextPanel from '@/components/ContextPanel'
 import BottomTabBar from '@/components/BottomTabBar'
+import AddCardModal from '@/components/AddCardModal'
 import './client.css'
 
 export default async function ClientLayout({
@@ -42,6 +43,9 @@ export default async function ClientLayout({
 
             {/* Bottom tab bar — shown on mobile ≤768px only via CSS */}
             <BottomTabBar />
+
+            {/* Global floating Add Card modal */}
+            <AddCardModal />
         </div>
     )
 }

@@ -102,46 +102,48 @@ export default function StudyEngine({ deck, libraryTitle, libraryId, taskId }: S
 
     return (
         <div className="study-engine">
-            {/* Progress bar */}
+            {/* Progress bar (Fixed to top edge via CSS) */}
             <div className="study-progress-track">
                 <div className="study-progress-fill" style={{ width: `${progress}%` }} />
             </div>
 
-            {/* Counter */}
-            <div className="study-counter">
-                {index + 1} / {cards.length}
-            </div>
-
-            {/* Card */}
-            <div className="study-card" onClick={() => !isRevealed && setIsRevealed(true)}>
-                <div className="card-face front">{currentCard.front_content}</div>
-
-                {isRevealed && (
-                    <>
-                        <div className="card-divider" />
-                        <div className="card-face back">{currentCard.back_content}</div>
-                        {currentCard.hint && (
-                            <div className="card-hint">💡 {currentCard.hint}</div>
-                        )}
-                    </>
-                )}
-
-                {!isRevealed && (
-                    <div className="card-tap-prompt">Tap to reveal</div>
-                )}
-            </div>
-
-            {/* Grade buttons — only visible after reveal */}
-            {isRevealed && (
-                <div className="grade-buttons">
-                    <button className="grade-btn again" onClick={() => grade('again')} disabled={isSubmitting}>Again</button>
-                    <button className="grade-btn hard" onClick={() => grade('hard')} disabled={isSubmitting}>Hard</button>
-                    <button className="grade-btn good" onClick={() => grade('good')} disabled={isSubmitting}>Good</button>
-                    <button className="grade-btn easy" onClick={() => grade('easy')} disabled={isSubmitting}>Easy</button>
+            <div className="study-content-wrapper">
+                {/* Counter */}
+                <div className="study-counter">
+                    {index + 1} / {cards.length}
                 </div>
-            )}
 
-            {isSubmitting && <p style={{ textAlign: 'center', color: '#94a3b8', marginTop: '1rem' }}>Saving results...</p>}
+                {/* Card */}
+                <div className="study-card" onClick={() => !isRevealed && setIsRevealed(true)}>
+                    <div className="card-face front">{currentCard.front_content}</div>
+
+                    {isRevealed && (
+                        <>
+                            <div className="card-divider" />
+                            <div className="card-face back">{currentCard.back_content}</div>
+                            {currentCard.hint && (
+                                <div className="card-hint">💡 {currentCard.hint}</div>
+                            )}
+                        </>
+                    )}
+
+                    {!isRevealed && (
+                        <div className="card-tap-prompt">Tap to reveal</div>
+                    )}
+                </div>
+
+                {/* Grade buttons — only visible after reveal */}
+                {isRevealed && (
+                    <div className="grade-buttons">
+                        <button className="grade-btn again" onClick={() => grade('again')} disabled={isSubmitting}>Again</button>
+                        <button className="grade-btn hard" onClick={() => grade('hard')} disabled={isSubmitting}>Hard</button>
+                        <button className="grade-btn good" onClick={() => grade('good')} disabled={isSubmitting}>Good</button>
+                        <button className="grade-btn easy" onClick={() => grade('easy')} disabled={isSubmitting}>Easy</button>
+                    </div>
+                )}
+
+                {isSubmitting && <p style={{ textAlign: 'center', color: '#94a3b8', marginTop: '1rem' }}>Saving results...</p>}
+            </div>
         </div>
     )
 }

@@ -1,44 +1,57 @@
 /* src/app/client/study/study.css */
 
 /* ========================
-   STUDY ENGINE CONTAINER
+   STUDY ENGINE CONTAINER (Distraction Free Overlay)
    ======================== */
 .study-engine {
-  max-width: 480px;
-  margin: 0 auto;
-  padding: 1.5rem 1rem 7rem 1rem;
-  min-height: 100vh;
-  background: #0f172a;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: #0f172a; /* Obsidian */
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  overflow-y: auto;
+}
+
+.study-content-wrapper {
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
 }
 
 /* ========================
-   PROGRESS BAR
+   PROGRESS BAR (Top Edge)
    ======================== */
 .study-progress-track {
-  width: 100%;
-  height: 3px;
-  background: #1e293b;
-  border-radius: 2px;
-  overflow: hidden;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: transparent;
+  z-index: 10000;
 }
 
 .study-progress-fill {
   height: 100%;
-  background: #8b5cf6;
-  transition: width 0.3s ease;
+  background: #7c3aed; /* Petra Purple */
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 10px rgba(124, 58, 237, 0.5);
 }
 
 /* ========================
    COUNTER
    ======================== */
 .study-counter {
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   font-weight: 700;
-  color: #475569;
-  letter-spacing: 0.08em;
+  color: #64748b;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   text-align: center;
 }
