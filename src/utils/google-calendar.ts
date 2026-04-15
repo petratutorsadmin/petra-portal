@@ -1,8 +1,41 @@
 import { google } from 'googleapis'
+import { createClient } from '@/utils/supabase/server'
+import { getOAuth2Client } from './google-oauth'
 
-export async function getCalendarClient() {
+export async function getCalendarClient(userId?: string) {
+    if (userId) {
+        const supabase = await createClient()
+        const { data: creds } = await supabase
+            .from('user_google_creds')
+            .select('*')
+            .eq('user_id', userId)
+            .single()
+
+        if (creds) {
+            const oauth2Client = getOAuth2Client()
+            oauth2Client.setCredentials({
+                access_token: creds.access_token,
+                refresh_token: creds.refresh_token,
+                expiry_date: Number(creds.expiry_date)
+            })
+
+            // Auto-refresh if expired
+            const isExpired = Number(creds.expiry_date) <= Date.now()
+            if (isExpired) {
+                const { credentials } = await oauth2Client.refreshAccessToken()
+                await supabase.from('user_google_creds').update({
+                    access_token: credentials.access_token,
+                    expiry_date: credentials.expiry_date,
+                    updated_at: new Date().toISOString()
+                }).eq('user_id', userId)
+            }
+
+            return google.calendar({ version: 'v3', auth: oauth2Client })
+        }
+    }
+
+    // Fallback to Service Account (JWT) if no userId or no creds found
     const email = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL
-    // Private keys in Vercel/Env variables need to have proper newlines reconstructed
     const privateKey = process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n')
 
     if (!email || !privateKey) {
@@ -24,12 +57,13 @@ export async function createCalendarEvent(lessonDetails: {
     startTime: string, // ISO string
     durationMinutes: number,
     tutorName: string,
-    studentName: string
+    studentName: string,
+    userId?: string // New optional param to use specific user's calendar
 }) {
     const calendarId = process.env.GOOGLE_CALENDAR_ID
     if (!calendarId) throw new Error('GOOGLE_CALENDAR_ID missing in environment variables.')
 
-    const calendar = await getCalendarClient()
+    const calendar = await getCalendarClient(lessonDetails.userId)
 
     const start = new Date(lessonDetails.startTime)
     const end = new Date(start.getTime() + lessonDetails.durationMinutes * 60000)
@@ -39,7 +73,7 @@ export async function createCalendarEvent(lessonDetails: {
         description: lessonDetails.description,
         start: {
             dateTime: start.toISOString(),
-            timeZone: 'Asia/Tokyo', // Can be dynamic later
+            timeZone: 'Asia/Tokyo',
         },
         end: {
             dateTime: end.toISOString(),
@@ -49,7 +83,7 @@ export async function createCalendarEvent(lessonDetails: {
 
     try {
         const res = await calendar.events.insert({
-            calendarId,
+            calendarId: lessonDetails.userId ? 'primary' : calendarId, // 'primary' for user, specific ID for service account
             requestBody: event,
         })
         console.log('Google Calendar event created:', res.data.htmlLink)

@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { logout } from '@/app/actions/auth'
 import { createClient } from '@/utils/supabase/server'
+import GoogleConnectButton from './GoogleConnectButton'
 
 export default async function AdminSidebar() {
     const supabase = await createClient()
@@ -45,7 +46,8 @@ export default async function AdminSidebar() {
                 </ul>
             </nav>
             <div className="sidebar-footer">
-                <form action={logout}>
+                <GoogleConnectButton />
+                <form action={logout} style={{ marginTop: '0.5rem' }}>
                     <button type="submit" className="logout-btn">Sign Out</button>
                 </form>
             </div>

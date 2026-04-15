@@ -53,7 +53,8 @@ export async function requestMatch(tutorId: string, tutorName: string, subjectPr
             startTime: trialDate.toISOString(),
             durationMinutes: 60,
             tutorName: tutorName,
-            studentName: studentName
+            studentName: studentName,
+            userId: user.id // Pass the user ID for OAuth lookup
         })
 
         console.log('Calendar sync attempt:', calendarRes)
