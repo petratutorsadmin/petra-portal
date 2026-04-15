@@ -1,7 +1,8 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
-import LevelProgressBar from '@/components/LevelProgressBar'
 import CheckableTaskCard from '@/components/CheckableTaskCard'
+import BriefingHeader from '@/components/BriefingHeader'
+import DebriefCard from '@/components/DebriefCard'
 import { completeTask } from './actions'
 import './student-app.css'
 
@@ -13,7 +14,7 @@ export default async function StudentCompanionHub() {
 
     const now = new Date().toISOString()
 
-    // Run all queries in PARALLEL — was sequential (3x slower)
+    // Parallel fetching for performance
     const [
         { data: profile },
         { data: tasks },
@@ -21,7 +22,7 @@ export default async function StudentCompanionHub() {
         { data: lastReport },
     ] = await Promise.all([
         supabase.from('student_profiles')
-            .select('current_xp, current_level, profiles!inner(first_name)')
+            .select('current_xp, current_level, current_streak, profiles!inner(first_name)')
             .eq('id', user.id)
             .single(),
 
@@ -53,22 +54,12 @@ export default async function StudentCompanionHub() {
 
     return (
         <div className="student-dashboard">
-            <header className="dashboard-header">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <p className="greeting-label">Good morning, {firstName}.</p>
-                    {streak > 0 && (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', background: 'rgba(249, 115, 22, 0.08)', padding: '0.4rem 0.8rem', borderRadius: '20px', border: '1px solid rgba(249, 115, 22, 0.2)' }}>
-                            <span style={{ fontSize: '1.2rem' }}>🔥</span>
-                            <span style={{ fontWeight: 800, color: '#f97316', fontSize: '0.9rem' }}>{streak} DAY STREAK</span>
-                        </div>
-                    )}
-                </div>
-                <h1>The Briefing</h1>
-                <LevelProgressBar 
-                    currentXp={profile?.current_xp || 0} 
-                    currentLevel={profile?.current_level || 1} 
-                />
-            </header>
+            <BriefingHeader 
+                firstName={firstName}
+                streak={streak}
+                currentXp={profile?.current_xp || 0}
+                currentLevel={profile?.current_level || 1}
+            />
 
             {nextLesson && (
                 <section className="lesson-anchor">
@@ -97,28 +88,7 @@ export default async function StudentCompanionHub() {
                 )}
             </section>
 
-            {lastReport && (
-                <section>
-                    <h2 className="section-title">Last Debrief</h2>
-                    <div className="debrief-card">
-                        <p className="debrief-quote">“{lastReport.student_visible_comments}”</p>
-                        
-                        {lastReport.skill_increments && Object.keys(lastReport.skill_increments).length > 0 && (
-                            <div className="skill-tags">
-                                {Object.entries(lastReport.skill_increments).map(([skill, val]) => {
-                                    const value = val as number
-                                    if (value === 0) return null
-                                    return (
-                                        <span key={skill} className={`skill-tag ${value > 0 ? 'positive' : 'negative'}`}>
-                                            {skill} {value > 0 ? '+' : ''}{value}
-                                        </span>
-                                    )
-                                })}
-                            </div>
-                        )}
-                    </div>
-                </section>
-            )}
+            {lastReport && <DebriefCard report={lastReport as any} />}
         </div>
     )
 }

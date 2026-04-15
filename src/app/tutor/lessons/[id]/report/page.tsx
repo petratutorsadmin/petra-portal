@@ -11,38 +11,42 @@ export default async function SubmitReportPage({
 }) {
     const { id } = await params
     const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
 
-    // 1. Fetch the specific lesson being reported
-    const { data: lesson, error: lessonError } = await supabase
-        .from('lessons')
-        .select(`
-            id, date_time, subject_program, status,
-            student:student_profiles(id, profiles(first_name, last_name))
-        `)
-        .eq('id', id)
-        .single()
+    // Fetch lesson, queue, and libraries in PARALLEL — performance optimization
+    const [
+        { data: lesson },
+        { data: lessonsQueue },
+        { data: libraries }
+    ] = await Promise.all([
+        supabase
+            .from('lessons')
+            .select(`
+                id, date_time, subject_program, status,
+                student:student_profiles(id, profiles(first_name, last_name))
+            `)
+            .eq('id', id)
+            .single(),
+        
+        supabase
+            .from('lessons')
+            .select(`
+                id, date_time, subject_program, status,
+                student:student_profiles(id, profiles(first_name, last_name))
+            `)
+            .eq('tutor_id', user?.id || '')
+            .order('date_time', { ascending: false })
+            .limit(15),
 
-    if (lessonError || !lesson) {
+        supabase
+            .from('card_libraries')
+            .select('id, title')
+            .order('title', { ascending: true })
+    ])
+
+    if (!lesson) {
         notFound()
     }
-
-    // 2. Fetch the tutor's pending/recent lessons queue for the Split-View
-    const { data: { user } } = await supabase.auth.getUser()
-    const { data: lessonsQueue } = await supabase
-        .from('lessons')
-        .select(`
-            id, date_time, subject_program, status,
-            student:student_profiles(id, profiles(first_name, last_name))
-        `)
-        .eq('tutor_id', user?.id || '')
-        .order('date_time', { ascending: false })
-        .limit(15)
-
-    // 3. Fetch card libraries for the task assignment dropdown
-    const { data: libraries } = await supabase
-        .from('card_libraries')
-        .select('id, title')
-        .order('title', { ascending: true })
 
     let studentId = ''
     let studentName = 'Student'

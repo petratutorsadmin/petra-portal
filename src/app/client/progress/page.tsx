@@ -2,6 +2,8 @@ import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import WordGraphWrapper from '@/components/WordGraphWrapper'
+import ProgressStats from '@/components/ProgressStats'
+import SkillMastery from '@/components/SkillMastery'
 
 export default async function ProgressPage() {
     const supabase = await createClient()
@@ -119,19 +121,12 @@ export default async function ProgressPage() {
             </section>
 
             {/* Stats Row */}
-            <div className="stats-row" style={{ marginBottom: '1.5rem' }}>
-                {[
-                    { label: 'Lessons', value: reports?.length ?? 0 },
-                    { label: 'Study Sessions', value: totalStudySessions },
-                    { label: 'Cards Reviewed', value: totalCardsReviewed },
-                    { label: 'Tasks Done', value: totalTasksCompleted },
-                ].map((s: any) => (
-                    <div key={s.label} className="progress-card" style={{ textAlign: 'center', padding: '1rem' }}>
-                        <p style={{ fontSize: '1.75rem', fontWeight: 800, color: '#0f172a', margin: '0 0 0.25rem' }}>{s.value}</p>
-                        <p style={{ fontSize: '0.75rem', fontWeight: 600, color: '#94a3b8', margin: 0, textTransform: 'uppercase' }}>{s.label}</p>
-                    </div>
-                ))}
-            </div>
+            <ProgressStats stats={[
+                { label: 'Lessons', value: reports?.length ?? 0 },
+                { label: 'Study Sessions', value: totalStudySessions },
+                { label: 'Cards Reviewed', value: totalCardsReviewed },
+                { label: 'Tasks Done', value: totalTasksCompleted },
+            ]} />
 
             {/* Knowledge Graph - Desktop Only */}
             <section className="desktop-only" style={{ marginBottom: '1.5rem' }}>
@@ -139,31 +134,7 @@ export default async function ProgressPage() {
             </section>
 
             {/* Skill Mastery */}
-            {sortedSkills.length > 0 && (
-                <section className="progress-card" style={{ marginBottom: '1.5rem' }}>
-                    <h2 className="progress-section-title">Skill Development</h2>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
-                        {sortedSkills.map(([skill, val]) => (
-                            <div key={skill}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.3rem' }}>
-                                    <span style={{ fontSize: '0.875rem', fontWeight: 600, color: '#0f172a' }}>{skill}</span>
-                                    <span style={{ fontSize: '0.875rem', fontWeight: 700, color: val > 0 ? '#10b981' : '#ef4444' }}>
-                                        {val > 0 ? '+' : ''}{val}
-                                    </span>
-                                </div>
-                                <div style={{ background: '#f1f5f9', borderRadius: '9999px', height: '6px', overflow: 'hidden' }}>
-                                    <div style={{
-                                        width: `${Math.abs(val) / maxSkillVal * 100}%`,
-                                        height: '100%',
-                                        background: val > 0 ? '#10b981' : '#ef4444',
-                                        borderRadius: '9999px'
-                                    }} />
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </section>
-            )}
+            <SkillMastery sortedSkills={sortedSkills} maxSkillVal={maxSkillVal} />
 
             {/* Recent Study Sessions */}
             {(sessions ?? []).length > 0 && (
