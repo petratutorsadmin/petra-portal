@@ -51,10 +51,10 @@ export default function CardEditorClient({
     }
 
     return (
-        <div style={{ display: 'flex', height: '100vh', width: '100vw', margin: '0 calc(-50vw + 50%)', background: 'var(--bg-workspace)' }}>
+        <div className="responsive-editor-layout">
             
             {/* Left Pane: Card List (280px) */}
-            <div style={{ width: '280px', borderRight: '1px solid var(--border-main)', display: 'flex', flexDirection: 'column', background: 'var(--bg-sidebar)' }}>
+            <div className="responsive-editor-sidebar">
                 <div style={{ padding: '24px 16px', borderBottom: '1px solid var(--border-main)' }}>
                     <h2 style={{ margin: '0 0 12px', fontSize: '11px', fontWeight: 600, color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                         {libraryTitle}

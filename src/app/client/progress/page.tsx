@@ -97,7 +97,7 @@ export default async function ProgressPage() {
             </header>
 
             {/* KPI Row - High Density Linear Style */}
-            <div style={{ display: 'flex', borderBottom: '1px solid var(--border-main)' }}>
+            <div className="responsive-grid-4" style={{ borderBottom: '1px solid var(--border-main)' }}>
                 <div style={{ flex: 1, padding: '16px 0', borderRight: '1px solid var(--border-main)' }}>
                     <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Current Level</div>
                     <div style={{ fontSize: '24px', fontWeight: 600, color: 'var(--text-primary)', marginTop: '4px' }}>{level}</div>
@@ -127,7 +127,7 @@ export default async function ProgressPage() {
                 </div>
             </section>
 
-            <div style={{ display: 'flex', gap: '48px', marginTop: '48px' }}>
+            <div className="responsive-split-2" style={{ marginTop: '48px' }}>
                 {/* Left Column: Skill Mastery & Study Sessions */}
                 <div style={{ flex: 1 }}>
                     <section className="dashboard-section" style={{ marginBottom: '32px' }}>

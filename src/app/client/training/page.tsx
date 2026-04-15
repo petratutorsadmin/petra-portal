@@ -77,11 +77,11 @@ export default async function TrainingLibrariesPage() {
                                     {subject}
                                 </div>
                                 {(libs ?? []).map((lib: any) => (
-                                    <div key={lib.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 0', borderBottom: '1px solid var(--border-main)' }}>
+                                    <div key={lib.id} className="mobile-wrap-flex" style={{ padding: '16px 0', borderBottom: '1px solid var(--border-main)' }}>
                                         <h3 style={{ margin: 0, fontWeight: 500, color: 'var(--text-primary)', fontSize: '13px' }}>
                                             {lib.title}
                                         </h3>
-                                        <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+                                        <div className="mobile-wrap-gap">
                                             <Link href={`/client/study?library_id=${lib.id}`} style={{ color: 'var(--text-primary)', textDecoration: 'underline', textDecorationColor: 'var(--border-main)', textUnderlineOffset: '2px', fontWeight: 500, fontSize: '12px' }}>Flashcards</Link>
                                             <Link href={`/client/study/match?library_id=${lib.id}`} style={{ color: 'var(--text-primary)', textDecoration: 'underline', textDecorationColor: 'var(--border-main)', textUnderlineOffset: '2px', fontWeight: 500, fontSize: '12px' }}>Match</Link>
                                             <Link href={`/client/study/speller?library_id=${lib.id}`} style={{ color: 'var(--text-primary)', textDecoration: 'underline', textDecorationColor: 'var(--border-main)', textUnderlineOffset: '2px', fontWeight: 500, fontSize: '12px' }}>Speller</Link>
