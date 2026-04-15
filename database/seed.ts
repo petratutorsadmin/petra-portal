@@ -67,10 +67,29 @@ async function seed() {
     else if (studentAuth.user) {
         const studentId = studentAuth.user.id
         await supabase.from('profiles').update({ role: 'student', first_name: 'Sam', last_name: 'Smith', timezone: 'Asia/Tokyo' }).eq('id', studentId)
+        
+        // Create a relational enrollment instead of text-field plan
+        console.log('Creating Student Enrollment...')
+        const { data: quote } = await supabase.from('pricing_quotes').insert({
+            student_id: studentId,
+            plan_name: 'Standard Tier 1',
+            base_rate_jpy: 5000,
+            total_monthly_jpy: 22000,
+            status: 'approved'
+        }).select().single()
+
+        if (quote) {
+            await supabase.from('student_enrollments').insert({
+                student_id: studentId,
+                quote_id: quote.id,
+                status: 'active',
+                start_date: new Date().toISOString()
+            })
+        }
+
         await supabase.from('student_profiles').insert({
             id: studentId,
             status: 'active',
-            assigned_plan: 'Standard Tier 1',
             current_xp: 750,
             current_level: 2
         })
