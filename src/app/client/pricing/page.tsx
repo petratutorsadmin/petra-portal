@@ -1,6 +1,6 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
-import { PlanChangeForm } from './PlanChangeForm'
+import PlanChangeForm from '@/components/PlanChangeForm'
 import PlanDetailsCard from '@/components/PlanDetailsCard'
 import BillingCard from '@/components/BillingCard'
 import PlanRequestList from '@/components/PlanRequestList'

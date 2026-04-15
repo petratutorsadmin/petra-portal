@@ -1,5 +1,7 @@
+'use client'
+
 import React from 'react'
-import { CancelRequestButton } from '@/app/client/pricing/PlanChangeForm'
+import { CancelRequestButton } from './CancelRequestButton'
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
     pending:      { label: '⏳ Pending',      color: '#92400e', bg: '#fef3c7' },

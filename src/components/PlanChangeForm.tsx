@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { submitPlanChangeRequest, cancelPlanChangeRequest, RequestType } from './actions'
+import { submitPlanChangeRequest, RequestType } from '@/app/client/pricing/actions'
 
 const REQUEST_TYPES: { type: RequestType; label: string; description: string; hasValues: boolean }[] = [
     { type: 'format_change', label: 'Change Lesson Format', description: 'Switch between online and in-person', hasValues: true },
@@ -19,7 +19,7 @@ const FORMAT_OPTIONS = ['online', 'in-person (nearby)', 'in-person (standard)', 
 const FREQUENCY_OPTIONS = ['1x per week', '2x per week', '3x per week', '4x per week']
 const LENGTH_OPTIONS = ['45 min', '60 min', '90 min', '120 min']
 
-export function PlanChangeForm() {
+export default function PlanChangeForm() {
     const [isOpen, setIsOpen] = useState(false)
     const [selectedType, setSelectedType] = useState<RequestType | null>(null)
     const [requestedValue, setRequestedValue] = useState('')
@@ -155,21 +155,5 @@ export function PlanChangeForm() {
                 </div>
             )}
         </form>
-    )
-}
-
-export function CancelRequestButton({ requestId }: { requestId: string }) {
-    const [cancelling, setCancelling] = useState(false)
-    return (
-        <button
-            onClick={async () => {
-                setCancelling(true)
-                await cancelPlanChangeRequest(requestId)
-            }}
-            disabled={cancelling}
-            style={{ fontSize: '0.75rem', color: '#ef4444', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600, padding: 0 }}
-        >
-            {cancelling ? 'Cancelling...' : 'Cancel request'}
-        </button>
     )
 }
