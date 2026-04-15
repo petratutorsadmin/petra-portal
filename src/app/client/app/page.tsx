@@ -11,37 +11,42 @@ export default async function StudentCompanionHub() {
     
     if (!user) redirect('/login')
 
-    // Fetch Profile XP
-    const { data: profile } = await supabase.from('student_profiles')
-        .select('current_xp, current_level')
-        .eq('id', user.id)
-        .single()
-
-    // Fetch Pending Tasks (Top 3)
-    const { data: tasks } = await supabase.from('student_tasks')
-        .select('*')
-        .eq('student_id', user.id)
-        .eq('status', 'pending')
-        .order('created_at', { ascending: false })
-        .limit(3)
-
-    // Fetch Next Lesson
     const now = new Date().toISOString()
-    const { data: nextLesson } = await supabase.from('lessons')
-        .select('*, profiles!lessons_tutor_id_fkey(first_name, last_name)')
-        .eq('student_id', user.id)
-        .gte('date_time', now)
-        .order('date_time', { ascending: true })
-        .limit(1)
-        .single()
 
-    // Fetch Last Debrief
-    const { data: lastReport } = await supabase.from('lesson_reports')
-        .select('*, lessons(date_time, subject_program)')
-        .eq('student_id', user.id)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .single()
+    // Run all queries in PARALLEL — was sequential (3x slower)
+    const [
+        { data: profile },
+        { data: tasks },
+        { data: nextLesson },
+        { data: lastReport },
+    ] = await Promise.all([
+        supabase.from('student_profiles')
+            .select('current_xp, current_level')
+            .eq('id', user.id)
+            .single(),
+
+        supabase.from('student_tasks')
+            .select('id, title, status, xp_reward, task_type, linked_library_id')
+            .eq('student_id', user.id)
+            .eq('status', 'pending')
+            .order('created_at', { ascending: false })
+            .limit(5),
+
+        supabase.from('lessons')
+            .select('id, date_time, subject_program, profiles!lessons_tutor_id_fkey(first_name)')
+            .eq('student_id', user.id)
+            .gte('date_time', now)
+            .order('date_time', { ascending: true })
+            .limit(1)
+            .maybeSingle(),
+
+        supabase.from('lesson_reports')
+            .select('student_visible_comments, skill_increments')
+            .eq('student_id', user.id)
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .maybeSingle(),
+    ])
 
     return (
         <div className="student-dashboard">
