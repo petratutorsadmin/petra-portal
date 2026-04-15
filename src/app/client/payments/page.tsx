@@ -19,8 +19,7 @@ export default async function ClientPaymentsPage() {
 
             <div className="dashboard-grid">
                 <div className="stat-card" style={{ borderColor: '#ef4444', background: '#fef2f2' }}>
-                    <h3 style={{ color: '#991b1b' }}>Outstanding Balance</h3>
-                    <p className="stat-number" style={{ color: '#7f1d1d' }}>$0.00</p>
+                    <p className="stat-number" style={{ color: '#7f1d1d' }}>¥0</p>
                 </div>
                 <div className="stat-card">
                     <h3>Last Payment Logged</h3>
@@ -50,8 +49,7 @@ export default async function ClientPaymentsPage() {
                                 const statusColor = inv.status === 'paid' ? 'success' : inv.status === 'unpaid' ? 'warning' : 'info'
                                 return (
                                     <tr key={inv.id}>
-                                        <td>{new Date(inv.created_at).toLocaleDateString()}</td>
-                                        <td style={{ fontWeight: '600' }}>${inv.amount.toFixed(2)}</td>
+                                        <td style={{ fontWeight: '600' }}>¥{inv.amount?.toLocaleString()}</td>
                                         <td>{inv.due_date ? new Date(inv.due_date).toLocaleDateString() : '-'}</td>
                                         <td><span className={`badge ${statusColor}`}>{inv.status}</span></td>
                                         <td>

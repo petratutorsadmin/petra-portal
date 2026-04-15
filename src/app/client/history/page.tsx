@@ -11,7 +11,7 @@ export default async function ClientHistoryPage() {
         .select(`
       id, created_at, topics_covered, student_visible_comments, student_engagement_rating,
       lesson:lessons(date_time, subject_program, tutor:tutor_profiles(id, profiles(first_name, last_name))),
-      homework:homework_items(task_description, next_lesson_focus, due_date, status)
+      tasks:student_tasks(title, description, due_date, status)
     `)
         .order('created_at', { ascending: false })
 
@@ -50,11 +50,26 @@ export default async function ClientHistoryPage() {
                                         {report.topics_covered && <div style={{ marginTop: '0.5rem', fontSize: '0.9rem', color: '#64748b' }}><strong>Topics:</strong> {report.topics_covered}</div>}
                                     </div>
 
-                                    {hw && (
-                                        <div style={{ backgroundColor: '#f8fafc', padding: '1rem', borderRadius: '6px', borderLeft: '3px solid #3b82f6' }}>
-                                            <h4 style={{ fontSize: '0.9rem', color: '#475569', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Next Lesson Focus / Homework</h4>
-                                            <p style={{ color: '#1e293b', fontSize: '0.95rem', fontWeight: '500' }}>{hw.task_description}</p>
-                                            {hw.due_date && <div style={{ fontSize: '0.85rem', color: '#64748b', marginTop: '0.5rem' }}>Due: {new Date(hw.due_date).toLocaleDateString()}</div>}
+                                    {report.tasks && report.tasks.length > 0 && (
+                                        <div style={{ backgroundColor: 'var(--bg-layout)', padding: '1rem', borderRadius: '6px', borderLeft: '3px solid var(--petra-purple)', marginTop: '1rem' }}>
+                                            <h4 style={{ fontSize: '0.75rem', color: 'var(--text-dim)', textTransform: 'uppercase', marginBottom: '0.75rem', fontWeight: 700 }}>Associated Tasks</h4>
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                                                {report.tasks.map((task: any, idx: number) => (
+                                                    <div key={idx} style={{ padding: '0.5rem 0' }}>
+                                                        <p style={{ color: 'var(--text-main)', fontSize: '0.95rem', fontWeight: '700', margin: 0 }}>
+                                                            {task.status === 'completed' ? '✓ ' : '○ '}{task.title}
+                                                        </p>
+                                                        {task.description && (
+                                                            <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: '0.25rem 0 0' }}>{task.description}</p>
+                                                        )}
+                                                        {task.due_date && (
+                                                            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
+                                                                Due: {new Date(task.due_date).toLocaleDateString()}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                ))}
+                                            </div>
                                         </div>
                                     )}
                                 </div>

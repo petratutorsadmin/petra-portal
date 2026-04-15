@@ -1,25 +1,76 @@
 import Link from 'next/link'
 import { logout } from '@/app/actions/auth'
+import { createClient } from '@/utils/supabase/server'
 
-export default function ClientSidebar() {
+// Primary OS modes (top group)
+const PRIMARY_NAV = [
+    { href: '/client/app',      label: '▶ Briefing', key: 'briefing'  },
+    { href: '/client/training', label: '◈ Training', key: 'training'  },
+    { href: '/client/progress', label: '◎ Progress', key: 'progress'  },
+    { href: '/client/pricing',  label: '⊞ My Plan',   key: 'plan'      },
+]
+
+// Utility links (secondary group)
+const UTILITY_NAV = [
+    { href: '/client/lessons',  label: '≡ Lessons'   },
+    { href: '/client/history',  label: '≡ History'   },
+    { href: '/client/tutors',   label: 'My Tutors'   },
+    { href: '/client/training/manage', label: 'Personal Vault' },
+    { href: '/client/payments', label: 'Payments'    },
+]
+
+export default async function ClientSidebar() {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    
+    let streak = 0
+    if (user) {
+        const { data: profile } = await supabase
+            .from('student_profiles')
+            .select('current_streak')
+            .eq('id', user.id)
+            .single()
+        streak = profile?.current_streak || 0
+    }
+
     return (
         <aside className="client-sidebar">
             <div className="client-sidebar-header">
-                <h2>Petra Portal</h2>
+                <h2>Petra OS</h2>
             </div>
             <nav className="client-nav">
                 <ul>
-                    <li><Link href="/client">Dashboard</Link></li>
-                    <li><Link href="/client/app">▶ Briefing</Link></li>
-                    <li><Link href="/client/training">◈ Training</Link></li>
-                    <li><Link href="/client/lessons">Upcoming Lessons</Link></li>
-                    <li><Link href="/client/history">Lesson History &amp; Homework</Link></li>
-                    <li><Link href="/client/tutors">My Tutors</Link></li>
-                    <li><Link href="/client/browse">Browse Tutors</Link></li>
-                    <li><Link href="/client/programs">My Programs</Link></li>
-                    <li><Link href="/client/pricing">My Plan</Link></li>
-                    <li><Link href="/client/pricing-estimator">Pricing Estimator</Link></li>
-                    <li><Link href="/client/payments">Payments / Invoices</Link></li>
+                    {PRIMARY_NAV.map(item => (
+                        <li key={item.href}>
+                            <Link href={item.href} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                <span>{item.label}</span>
+                                {item.key === 'briefing' && streak > 0 && (
+                                    <span style={{ 
+                                        color: '#f97316', 
+                                        fontSize: '0.75rem', 
+                                        fontWeight: 800, 
+                                        background: 'rgba(249, 115, 22, 0.1)',
+                                        padding: '0.1rem 0.4rem',
+                                        borderRadius: '4px',
+                                        marginRight: '0.5rem'
+                                    }}>
+                                        🔥 {streak}
+                                    </span>
+                                )}
+                            </Link>
+                        </li>
+                    ))}
+                </ul>
+
+                {/* Divider */}
+                <div style={{ height: '1px', background: 'rgba(255,255,255,0.07)', margin: '0.75rem 1rem' }} />
+
+                <ul>
+                    {UTILITY_NAV.map(item => (
+                        <li key={item.href}>
+                            <Link href={item.href} style={{ fontSize: '0.8rem' }}>{item.label}</Link>
+                        </li>
+                    ))}
                 </ul>
             </nav>
             <div className="sidebar-footer">

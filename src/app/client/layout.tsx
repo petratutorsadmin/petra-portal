@@ -1,6 +1,8 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
 import ClientSidebar from '@/components/ClientSidebar'
+import ContextPanel from '@/components/ContextPanel'
+import BottomTabBar from '@/components/BottomTabBar'
 import './client.css'
 
 export default async function ClientLayout({
@@ -27,10 +29,19 @@ export default async function ClientLayout({
 
     return (
         <div className="client-layout">
+            {/* Left sidebar — shown on desktop/tablet, hidden on mobile */}
             <ClientSidebar />
+
+            {/* Main workspace */}
             <main className="client-main">
                 {children}
             </main>
+
+            {/* Right context panel — shown on desktop ≥1024px only via CSS */}
+            <ContextPanel userId={user.id} />
+
+            {/* Bottom tab bar — shown on mobile ≤768px only via CSS */}
+            <BottomTabBar />
         </div>
     )
 }

@@ -21,7 +21,7 @@ export default async function StudentCompanionHub() {
         { data: lastReport },
     ] = await Promise.all([
         supabase.from('student_profiles')
-            .select('current_xp, current_level')
+            .select('current_xp, current_level, profiles!inner(first_name)')
             .eq('id', user.id)
             .single(),
 
@@ -48,9 +48,21 @@ export default async function StudentCompanionHub() {
             .maybeSingle(),
     ])
 
+    const firstName = (profile as any)?.profiles?.first_name || 'Student'
+    const streak = (profile as any)?.current_streak || 0
+
     return (
         <div className="student-dashboard">
             <header className="dashboard-header">
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <p className="greeting-label">Good morning, {firstName}.</p>
+                    {streak > 0 && (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', background: 'rgba(249, 115, 22, 0.08)', padding: '0.4rem 0.8rem', borderRadius: '20px', border: '1px solid rgba(249, 115, 22, 0.2)' }}>
+                            <span style={{ fontSize: '1.2rem' }}>🔥</span>
+                            <span style={{ fontWeight: 800, color: '#f97316', fontSize: '0.9rem' }}>{streak} DAY STREAK</span>
+                        </div>
+                    )}
+                </div>
                 <h1>The Briefing</h1>
                 <LevelProgressBar 
                     currentXp={profile?.current_xp || 0} 

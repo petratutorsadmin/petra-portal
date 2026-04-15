@@ -1,0 +1,109 @@
+.vault-page {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.vault-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+.vault-card {
+    background: var(--bg-card, #ffffff);
+    border: 1px solid var(--border-color, #e2e8f0);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.vault-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.vault-card.new-set {
+    background: var(--bg-secondary, #f8fafc);
+    border: 2px dashed var(--border-color, #cbd5e1);
+}
+
+.vault-card h3 {
+    margin: 0 0 1rem 0;
+    font-size: 1.1rem;
+    color: var(--text-main, #1e293b);
+}
+
+.vault-form .form-group {
+    margin-bottom: 0.75rem;
+}
+
+.vault-form input {
+    width: 100%;
+    padding: 0.6rem;
+    border: 1px solid var(--border-color, #e2e8f0);
+    border-radius: 6px;
+    background: #fff;
+    font-size: 0.9rem;
+}
+
+.collection-item {
+    border-top: 4px solid var(--petra-purple, #7c3aed);
+}
+
+.collection-subject {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--text-dim, #64748b);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.25rem;
+}
+
+.collection-title {
+    font-size: 1.25rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+}
+
+.collection-meta {
+    font-size: 0.85rem;
+    color: var(--text-muted, #94a3b8);
+}
+
+.collection-actions {
+    margin-top: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.btn-icon.delete {
+    background: none;
+    border: none;
+    font-size: 1.25rem;
+    cursor: pointer;
+    opacity: 0.5;
+    transition: opacity 0.2s;
+}
+
+.btn-icon.delete:hover {
+    opacity: 1;
+    color: #ef4444;
+}
+
+/* Card Designer specific */
+.card-designer-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+@media (max-width: 768px) {
+    .card-designer-grid {
+        grid-template-columns: 1fr;
+    }
+}

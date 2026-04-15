@@ -78,7 +78,7 @@ export default async function AdminPricingPage({
                                         <><td>{row.name}</td><td>{row.multiplier}x</td><td>{row.description}</td></>
                                     )}
                                     {tab === 'rules' && (
-                                        <><td>{row.tutor_level}</td><td>${row.min_pay}</td><td>${row.standard_pay}</td><td>${row.max_pay}</td></>
+                                        <><td>{row.tutor_level}</td><td>¥{row.min_pay}</td><td>¥{row.standard_pay}</td><td>¥{row.max_pay}</td></>
                                     )}
                                     {tab === 'markets' && (
                                         <><td>{row.region_name}</td><td>{row.multiplier}x</td></>

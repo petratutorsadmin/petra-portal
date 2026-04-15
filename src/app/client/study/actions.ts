@@ -78,21 +78,50 @@ export async function completeStudySession({
         xp_earned: xpEarned,
     })
 
-    // 3. Award XP + handle level-up
+    // 3. Award XP + handle level-up + handle STREAK
     const { data: profile } = await supabase
         .from('student_profiles')
-        .select('current_xp, current_level')
+        .select('current_xp, current_level, current_streak, last_study_date')
         .eq('id', user.id)
         .single()
 
     if (profile) {
+        // XP logic
         let newXp = (profile.current_xp || 0) + xpEarned
         let newLevel = profile.current_level || 1
         while (newXp >= newLevel * 500) {
             newLevel += 1
         }
+
+        // Streak logic
+        const JST_OFFSET = 9 * 60 * 60 * 1000 // 9 hours
+        const todayJST = new Date(Date.now() + JST_OFFSET).toISOString().split('T')[0]
+        let newStreak = profile.current_streak || 0
+        const lastDate = profile.last_study_date
+
+        if (!lastDate) {
+            newStreak = 1
+        } else {
+            const last = new Date(lastDate)
+            const today = new Date(todayJST)
+            const diffDays = Math.floor((today.getTime() - last.getTime()) / (1000 * 3600 * 24))
+
+            if (diffDays === 1) {
+                newStreak += 1 // Consecutive day
+            } else if (diffDays > 1) {
+                newStreak = 1 // Reset
+            } else if (diffDays === 0) {
+                // Already studied today — keep current streak
+            }
+        }
+
         await supabase.from('student_profiles')
-            .update({ current_xp: newXp, current_level: newLevel })
+            .update({ 
+                current_xp: newXp, 
+                current_level: newLevel,
+                current_streak: newStreak,
+                last_study_date: todayJST
+            })
             .eq('id', user.id)
     }
 

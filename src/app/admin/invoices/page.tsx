@@ -53,8 +53,8 @@ export default async function AdminInvoicesPage({
                             </select>
                         </div>
                         <div className="form-group flex-1">
-                            <label htmlFor="amount">Amount (USD)</label>
-                            <input id="amount" name="amount" type="number" step="0.01" min="0" placeholder="e.g. 250.00" required />
+                            <label htmlFor="amount">Amount (JPY)</label>
+                            <input id="amount" name="amount" type="number" step="1" min="0" placeholder="e.g. 25000" required />
                         </div>
                         <div className="form-group flex-1">
                             <label htmlFor="due_date">Due Date</label>
@@ -102,7 +102,7 @@ export default async function AdminInvoicesPage({
                                     <tr key={inv.id}>
                                         <td>{new Date(inv.created_at).toLocaleDateString()}</td>
                                         <td>{studentName}</td>
-                                        <td style={{ fontWeight: '600' }}>${inv.amount.toFixed(2)}</td>
+                                        <td style={{ fontWeight: '600' }}>¥{inv.amount?.toLocaleString()}</td>
                                         <td>{inv.due_date ? new Date(inv.due_date).toLocaleDateString() : '—'}</td>
                                         <td><span className={`badge ${statusColor}`}>{inv.status}</span></td>
                                         <td>

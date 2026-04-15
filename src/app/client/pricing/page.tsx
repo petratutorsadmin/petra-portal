@@ -29,11 +29,34 @@ export default async function PlanManagementPage() {
     if (!user) redirect('/login')
 
     const [
+        { data: enrollment },
         { data: match },
         { data: recentLesson },
         { data: changeRequests },
         { data: nextInvoice },
     ] = await Promise.all([
+        // ACTIVE ENROLLMENT (Truth)
+        supabase.from('student_enrollments')
+            .select(`
+                id, 
+                status, 
+                start_date, 
+                end_date,
+                pricing_quotes (
+                    id,
+                    program_id,
+                    program_categories(name),
+                    lesson_length_minutes,
+                    lessons_per_week,
+                    delivery_code,
+                    client_price_per_lesson
+                )
+            `)
+            .eq('student_id', user.id)
+            .eq('status', 'active')
+            .limit(1)
+            .maybeSingle(),
+
         // Active tutor match
         supabase.from('matches')
             .select(`
@@ -47,7 +70,7 @@ export default async function PlanManagementPage() {
             .limit(1)
             .maybeSingle(),
 
-        // Most recent lesson for current format/length
+        // Most recent lesson (fallback for title/format if no enrollment)
         supabase.from('lessons')
             .select('duration_minutes, delivery_type, subject_program')
             .eq('student_id', user.id)
@@ -55,7 +78,7 @@ export default async function PlanManagementPage() {
             .limit(1)
             .maybeSingle(),
 
-        // Plan change requests (most recent first)
+        // Plan change requests
         supabase.from('plan_change_requests')
             .select('*')
             .eq('student_id', user.id)
@@ -74,6 +97,12 @@ export default async function PlanManagementPage() {
     const tutorProfile = match?.tutor_profiles as any
     const tutorFirstName = tutorProfile?.profiles?.first_name ?? '—'
     const tutorLastName = tutorProfile?.profiles?.last_name ?? ''
+
+    const quote = (enrollment?.pricing_quotes as any)
+    const programName = quote?.program_categories?.name ?? recentLesson?.subject_program ?? '—'
+    const lessonLength = quote?.lesson_length_minutes ?? recentLesson?.duration_minutes
+    const lessonsPerWeek = quote?.lessons_per_week ?? '—'
+    const deliveryType = quote?.delivery_code ?? recentLesson?.delivery_type
 
     const activeRequests = (changeRequests ?? []).filter(r => ['pending', 'under_review'].includes(r.status))
     const pastRequests = (changeRequests ?? []).filter(r => ['approved', 'declined', 'cancelled'].includes(r.status))
@@ -99,19 +128,23 @@ export default async function PlanManagementPage() {
                                 <span className="plan-row-value">{match ? `${tutorFirstName} ${tutorLastName}` : 'Not yet matched'}</span>
                             </div>
                             <div className="plan-row">
-                                <span className="plan-row-label">Focus Area</span>
-                                <span className="plan-row-value">{recentLesson?.subject_program ?? '—'}</span>
+                                <span className="plan-row-label">Program</span>
+                                <span className="plan-row-value">{programName}</span>
                             </div>
                             <div className="plan-row">
-                                <span className="plan-row-label">Lesson Format</span>
+                                <span className="plan-row-label">Format</span>
                                 <span className="plan-row-value" style={{ textTransform: 'capitalize' }}>
-                                    {recentLesson?.delivery_type?.replace(/_/g, ' ') ?? '—'}
+                                    {deliveryType?.replace(/_/g, ' ') ?? '—'}
                                 </span>
                             </div>
                             <div className="plan-row">
-                                <span className="plan-row-label">Lesson Length</span>
+                                <span className="plan-row-label">Frequency</span>
+                                <span className="plan-row-value">{lessonsPerWeek} lessons / week</span>
+                            </div>
+                            <div className="plan-row">
+                                <span className="plan-row-label">Length</span>
                                 <span className="plan-row-value">
-                                    {recentLesson?.duration_minutes ? `${recentLesson.duration_minutes} min` : '—'}
+                                    {lessonLength ? `${lessonLength} min` : '—'}
                                 </span>
                             </div>
                         </div>
